@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WPH Endoscopy Procedures Guide & Clinical Guidelines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            300: '#d4d4d8',
+                            400: '#a1a1aa',
+                            500: '#71717a',
+                            600: '#52525b',
+                            700: '#3f3f46',
+                            800: '#27272a',
+                            900: '#18181b',
+                            950: '#09090b',
+                        },
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                        },
+                        accent: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'scale-up': 'scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-subtle': 'pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(5px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleUp: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        pulseSubtle: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+        .modal-overlay {
+            background-color: rgba(9, 9, 11, 0.7); 
+            backdrop-filter: blur(8px);
+        }
+        .rotate-180 { transform: rotate(180deg); }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(228, 228, 231, 0.6);
+        }
+        .dark .glass-header {
+            background: rgba(24, 24, 27, 0.85);
+            border-bottom: 1px solid rgba(39, 39, 42, 0.6);
+        }
+        
+        @keyframes slideInUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .toast-enter { animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="min-h-screen p-3 md:p-6 text-slate-800 bg-slate-100 dark:bg-black dark:text-slate-100 selection:bg-primary-100 dark:selection:bg-primary-900 selection:text-primary-900 dark:selection:text-primary-100">
+
+    <div id="toast-container" class="fixed bottom-6 left-1/2 z-50 pointer-events-none w-full max-w-sm"></div>
+
+    <div id="app" class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden min-h-[85vh] flex flex-col transition-all duration-300">
+        <div class="flex-1 flex flex-col items-center justify-center py-20 space-y-4">
+            <div class="relative">
+                <div class="w-16 h-16 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-primary-500 animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+                </div>
+            </div>
+            <p class="text-sm font-semibold text-slate-400 dark:text-slate-500 animate-pulse-subtle tracking-wide">INITIALIZING DIRECTORY...</p>
+        </div>
+    </div>
+
+    <div id="accessory-modal" class="fixed inset-0 hidden modal-overlay items-center justify-center p-4 z-50 transition-opacity duration-300" aria-modal="true" role="dialog"></div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        let db, auth;
+        let userId = null;
+        let appOwnerId = null;
+        let proceduresData = [];
+        
+        let searchTerm = '';
+        let selectedFilter = 'All';
+        let selectedAreaFilter = 'All';
+        let showFavoritesOnly = false;
+        let currentView = 'directory';
+        let activeTool = 'gbs';
+        let expandedProcedures = new Set();
+        let permissionError = false;
+        
+        let favorites = new Set(JSON.parse(localStorage.getItem('wph_favorites') || '[]'));
+        let isDarkMode = localStorage.getItem('wph_dark_mode') === 'true';
+        let isLoading = true;
+        let isAuthReady = false;
+        
+        let gbsScoreData = { urea: '', hb: '', sbp: '', pulse: '', melena: false, syncope: false, hepatic: false, cardiac: false, gender: 'male' };
+        let rockallData = { age: 0, shock: 0, comorbid: 0, diag: 0, stigmata: 0 };
+        let bbpsData = { right: 3, transverse: 3, left: 3 };
+        let bsgData = { num: '', size: 'small', piecemeal: false };
+        let anticoagData = { med: 'aspirin', risk: 'low' };
+
+        if (isDarkMode) document.documentElement.classList.add('dark');
+
+        const ACCESORY_TYPES = ['All', 'Diagnostic', 'Therapeutic', 'Cleaning', 'Imaging', 'Other'];
+        const ACCESORY_MANUFACTURERS = ['Cook Medical', 'Boston Scientific', 'Olympus', 'Medtronic', 'Hitachi', 'Baxter', 'Steris', '3-D Matrix', 'C. R. Bard', 'ERBE', 'US Endoscopy'];
+        const PROCEDURE_AREAS = ['All', 'Upper GI', 'Lower GI', 'Advanced', 'Other'];
+        
+        const INITIAL_PROCEDURE_DATA = [
+             { id: 'EGD', name: 'EGD (Upper Endoscopy)', area: 'Upper GI', order: 1, accessories: [
+                { id: 'biopsy_forceps', name: 'Standard Biopsy Forceps', type: 'Diagnostic', manufacturer: 'Olympus', use: 'Collecting routine tissue samples from mucosa.', channel: '2.8mm', length: '160cm', reuse: 'Single-use' },
+                { id: 'gold_probe', name: 'Gold Probe (Bipolar Hemostasis)', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Thermal coagulation of bleeding ulcers.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'hemoclip_applicator', name: 'Hemoclip Applicator', type: 'Therapeutic', manufacturer: 'Medtronic', use: 'Treating bleeding ulcers and perforations.', channel: '2.8mm', length: '165cm', reuse: 'Single-use' },
+                { id: 'dilation_balloon', name: 'TTS Dilation Balloon', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Treating benign strictures.', channel: '2.8mm', length: '180cm', reuse: 'Single-use' },
+                { id: 'bougie_dilator', name: 'Esophageal Bougie (Savary)', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Wire-guided dilation of splitures.', channel: 'N/A', length: 'N/A', reuse: 'Reusable' },
+                { id: 'nexpowder', name: 'Nexpowder', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Hemostatic powder spray.', channel: '2.8mm', length: '220cm', reuse: 'Single-use' },
+                { id: 'variceal_banding', name: 'Variceal Banding Kit', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Ligation of esophageal varices.', channel: '2.8mm', length: 'N/A', reuse: 'Single-use' },
+                { id: 'esophageal_stent', name: 'Esophageal Stent (SEMS)', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Palliative treatment for obstruction.', channel: '3.7mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'botox_needle', name: 'Botox Injection Needle', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Achalasia treatment.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'sengstaken_tube', name: 'Sengstaken-Blakemore', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Emergency tamponade.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' }
+            ]},
+            { id: 'FOREIGN_BODY', name: 'Foreign Body Mgmt', area: 'Other', order: 2, accessories: [
+                 { id: 'roth_net', name: 'Roth Net', type: 'Therapeutic', manufacturer: 'US Endoscopy', use: 'Foreign body/polyp retrieval.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                 { id: 'raptor_graspers', name: 'Raptor Graspers', type: 'Therapeutic', manufacturer: 'US Endoscopy', use: 'Retrieval of sharp/heavy objects.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                 { id: 'scope_hood', name: 'Protective Hood', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Mucosal protection during extraction.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' },
+                 { id: 'overtube', name: 'Overtube', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Repeated access protection.', channel: 'N/A', length: '50cm', reuse: 'Single-use' }
+            ]},
+            { id: 'Colonoscopy', name: 'Colonoscopy', area: 'Lower GI', order: 3, accessories: [
+                { id: 'polypectomy_snare_hot', name: 'Electrocautery Snare', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Removing large sessile/pedunculated polyps.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'polypectomy_snare_cold', name: 'Cold Polypectomy Snare', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Removing diminutive polyps (<10mm).', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'injection_needle', name: 'Injection Needle', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Injecting solutions/lifting polyps.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'coagulation_probe', name: 'Heater Probe', type: 'Therapeutic', manufacturer: 'Medtronic', use: 'Thermal hemostasis.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'colonic_stent', name: 'Colonic Stent (SEMS)', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Palliative treatment for obstruction.', channel: '3.7mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'floseal', name: 'Floseal Matrix', type: 'Therapeutic', manufacturer: 'Baxter', use: 'Hemostatic matrix.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'polyloop', name: 'Polyloop', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Ligation of polyp stalks.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'chromo_spray', name: 'Chromo Spray Catheter', type: 'Diagnostic', manufacturer: 'Olympus', use: 'Dye application.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' },
+                { id: 'purastat_colo', name: 'Purastat', type: 'Therapeutic', manufacturer: '3-D Matrix', use: 'Hemostatic gel.', channel: '2.8mm', length: '230cm', reuse: 'Single-use' }
+            ]},
+            { id: 'EUS', name: 'Endoscopic Ultrasound (EUS)', area: 'Advanced', order: 4, accessories: [
+                { id: 'fna_needle', name: 'EUS-FNA Needle', type: 'Diagnostic', manufacturer: 'Boston Scientific', use: 'Fine Needle Aspiration.', channel: '2.8mm', length: '140cm', reuse: 'Single-use' }
+            ]},
+            { id: 'ERCP', name: 'ERCP', area: 'Advanced', order: 5, accessories: [
+                { id: 'sphincterotome', name: 'Sphincterotome', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Cutting the sphincter of Oddi.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'retrieval_basket', name: 'Stone Retrieval Basket', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Capturing and removing stones.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'biliary_stent', name: 'Plastic Biliary Stent', type: 'Therapeutic', manufacturer: 'Medtronic', use: 'Biliary drainage.', channel: '3.2mm', length: '200cm', reuse: 'Single-use' },
+                { id: 'guide_wire', name: 'Hydrophilic Guidewire', type: 'Diagnostic', manufacturer: 'Boston Scientific', use: 'Cannulation aid.', channel: 'N/A', length: '450cm', reuse: 'Single-use' },
+                { id: 'spyglass_ds', name: 'SpyGlass DS Catheter', type: 'Imaging', manufacturer: 'Boston Scientific', use: 'Digital Cholangioscopy.', channel: '4.2mm', length: '200cm', reuse: 'Single-use' }
+            ]},
+            { id: 'PEG', name: 'PEG Placement', area: 'Advanced', order: 6, accessories: [
+                { id: 'peg_kit', name: 'PEG Placement Kit', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Initial placement of gastrostomy tube.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' },
+                { id: 'peg_exchange', name: 'PEG Exchange Tube', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Replacing gastrostomy tube.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' },
+                { id: 'bumper_snare', name: 'Bumper Removal Snare', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Removing embedded bumpers.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' }
+            ]},
+            { id: 'ELECTROSURG', name: 'Electrosurgery', area: 'Advanced', order: 7, accessories: [
+                { id: 'erbe_vio', name: 'ERBE VIO 300S', type: 'Other', manufacturer: 'ERBE', use: 'Electrosurgical Unit.', channel: 'N/A', length: 'N/A', reuse: 'Reusable' },
+                { id: 'apc_probe', name: 'APC Probe', type: 'Therapeutic', manufacturer: 'ERBE', use: 'Argon Plasma Coagulation.', channel: '2.8mm', length: '220cm', reuse: 'Single-use' },
+                { id: 'grounding_pad', name: 'Grounding Pad', type: 'Diagnostic', manufacturer: 'ERBE', use: 'Patient return electrode.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' }
+            ]},
+            { id: 'NGNJ', name: 'NG/NJ Tube Placement', area: 'Other', order: 8, accessories: [
+                { id: 'ng_tube', name: 'NG Tube', type: 'Therapeutic', manufacturer: 'C. R. Bard', use: 'Nasogastric feeding/drainage.', channel: 'N/A', length: '120cm', reuse: 'Single-use' },
+                { id: 'nj_tube', name: 'NJ Tube', type: 'Therapeutic', manufacturer: 'C. R. Bard', use: 'Nasojejunal feeding.', channel: 'N/A', length: '140cm', reuse: 'Single-use' },
+                { id: 'feed_wire', name: 'Feeding Tube Guidewire', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Stiffening wire for placement.', channel: 'N/A', length: '150cm', reuse: 'Single-use' }
+            ]},
+            { id: 'CAPENDO', name: 'Capsule Endoscopy', area: 'Other', order: 9, accessories: [
+                { id: 'pillcam', name: 'PillCam SB3', type: 'Imaging', manufacturer: 'Medtronic', use: 'Small bowel imaging.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' },
+                { id: 'recorder_belt', name: 'Data Recorder Belt', type: 'Imaging', manufacturer: 'Medtronic', use: 'Image capture unit.', channel: 'N/A', length: 'N/A', reuse: 'Reusable' }
+            ]},
+            { id: 'ANORECTAL', name: 'Anorectal Procedures', area: 'Lower GI', order: 10, accessories: [
+                { id: 'hem_banding', name: 'Hemorrhoid Banding Kit', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Band ligation of hemorrhoids.', channel: '2.8mm', length: 'N/A', reuse: 'Single-use' },
+                { id: 'anoscope', name: 'Anoscope Kit', type: 'Other', manufacturer: 'Boston Scientific', use: 'Direct visualization.', channel: 'N/A', length: 'N/A', reuse: 'Single-use' }
+            ]}
+        ];
+
+        const SearchIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
+        const XIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+        const ActivityIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`; 
+        const YoutubeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M2.8 14.5c-.83-1.3-.83-3.4 0-4.7C4.6 6.1 9.3 4 12 4s7.4 2.1 9.2 5.8c.83 1.3.83 3.4 0 4.7-1.8 3.7-6.5 5.8-9.2 5.8S4.6 18.2 2.8 14.5z"/><path d="m10 16 5-4-5-4z"/></svg>`;
+        const FileTextIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>`;
+        const PlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
+        const LoaderIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 mr-2 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+        const ChevronDownIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="m6 9 6 6 6-6"/></svg>`;
+        const MoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+        const SunIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+        const StarIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+        const CalculatorIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>`;
+
+        // Environment Detection and Path Formatting
+        const getPublicCollectionPath = (collectionName) => {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : null;
+            if (appId) {
+                // Shared Preview Environment Path
+                return `artifacts/${appId}/public/data/${collectionName}`;
+            }
+            // Standalone Path
+            return collectionName;
+        };
+
+        const generateUUID = () => crypto.randomUUID();
+
+        const getMockVideoUrl = (name) => `https://www.google.com/search?q=${encodeURIComponent(name + " endoscopy video")}&tbm=vid`;
+        const getJAGGuidelinesUrl = (name) => `https://www.google.com/search?q=${encodeURIComponent(name + " guidelines")}`;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-enter flex items-center bg-slate-800/90 dark:bg-slate-700/90 backdrop-blur text-white px-5 py-3.5 rounded-2xl shadow-2xl mb-4 border border-slate-700/50 dark:border-slate-600/50 mx-auto`;
+            toast.innerHTML = `<div class="mr-3 flex-shrink-0 w-6 h-6 rounded-full ${type === 'success' ? 'bg-primary-500' : 'bg-primary-500'} flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-primary-500/30">✓</div><div class="text-sm font-semibold tracking-wide">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px) scale(0.95)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        window.toggleDarkMode = () => {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('wph_dark_mode', isDarkMode);
+            if (isDarkMode) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+            renderApp();
+        };
+
+        window.toggleFavorite = (id) => {
+            if (favorites.has(id)) favorites.delete(id);
+            else favorites.add(id);
+            localStorage.setItem('wph_favorites', JSON.stringify([...favorites]));
+            if (currentView === 'directory') {
+                const contentArea = document.getElementById('main-content-area');
+                if (contentArea) contentArea.innerHTML = renderDirectorySection();
+                else renderApp();
+            } else {
+                renderApp();
+            }
+            showToast(favorites.has(id) ? 'Added to My Kit' : 'Removed from My Kit');
+        };
+
+        window.toggleProc = (id) => {
+            if (expandedProcedures.has(id)) expandedProcedures.delete(id); 
+            else expandedProcedures.add(id);
+            const contentArea = document.getElementById('main-content-area');
+            if (contentArea && currentView === 'directory') contentArea.innerHTML = renderDirectorySection();
+            else renderApp();
+        };
+
+        window.setView = (view) => { currentView = view; renderApp(); };
+        window.setTool = (tool) => { activeTool = tool; renderApp(); };
+        
+        window.setSearch = (val) => { 
+            searchTerm = val; 
+            const input = document.getElementById('search-input');
+            if (input && input.value !== val) input.value = val;
+
+            const clearBtn = document.getElementById('search-clear-btn');
+            if (clearBtn) {
+                if (val) clearBtn.classList.remove('hidden', 'opacity-0');
+                else clearBtn.classList.add('hidden', 'opacity-0');
+            }
+
+            const contentArea = document.getElementById('main-content-area');
+            if (contentArea && currentView === 'directory') {
+                contentArea.innerHTML = renderDirectorySection();
+            } else {
+                renderApp();
+            }
+        };
+
+        window.toggleFavoritesFilter = () => { showFavoritesOnly = !showFavoritesOnly; renderApp(); };
+        window.setAreaFilter = (area) => { selectedAreaFilter = area; renderApp(); };
+        window.updateGBS = (key, value) => { gbsScoreData[key] = value; renderApp(); };
+        window.updateRockall = (key, value) => { rockallData[key] = parseInt(value); renderApp(); };
+        window.updateBBPS = (key, value) => { bbpsData[key] = parseInt(value); renderApp(); };
+        window.updateBSG = (key, value) => { bsgData[key] = value; renderApp(); };
+        window.updateAnticoag = (key, value) => { anticoagData[key] = value; renderApp(); };
+
+        const calculateGBS = () => {
+            let score = 0;
+            const urea = parseFloat(gbsScoreData.urea) || 0;
+            const hb = parseFloat(gbsScoreData.hb) || 0;
+            const sbp = parseFloat(gbsScoreData.sbp) || 0;
+            const pulse = parseFloat(gbsScoreData.pulse) || 0;
+
+            if (urea >= 6.5 && urea < 8) score += 2;
+            else if (urea >= 8 && urea < 10) score += 3;
+            else if (urea >= 10 && urea < 25) score += 4;
+            else if (urea >= 25) score += 6;
+
+            if (gbsScoreData.gender === 'male' && hb > 0) {
+                if (hb >= 120 && hb < 130) score += 1;
+                else if (hb >= 100 && hb < 120) score += 3;
+                else if (hb < 100) score += 6;
+            } else if (gbsScoreData.gender === 'female' && hb > 0) {
+                if (hb >= 100 && hb < 120) score += 1;
+                else if (hb < 100) score += 6;
+            }
+
+            if (sbp > 0) {
+                if (sbp >= 100 && sbp < 110) score += 1;
+                else if (sbp >= 90 && sbp < 100) score += 2;
+                else if (sbp < 90) score += 3;
+            }
+
+            if (pulse >= 100) score += 1;
+            if (gbsScoreData.melena) score += 1;
+            if (gbsScoreData.syncope) score += 2;
+            if (gbsScoreData.hepatic) score += 2;
+            if (gbsScoreData.cardiac) score += 2;
+
+            return score;
+        };
+
+        const calculateRockall = () => {
+            return rockallData.age + rockallData.shock + rockallData.comorbid + rockallData.diag + rockallData.stigmata;
+        }
+
+        const calculateBBPS = () => {
+            return bbpsData.right + bbpsData.transverse + bbpsData.left;
+        }
+
+        const getBSGRecommendation = () => {
+            const num = parseInt(bsgData.num) || 0;
+            const size = bsgData.size;
+            const piecemeal = bsgData.piecemeal;
+
+            if (piecemeal === true || piecemeal === 'true') {
+                 return { type: 'Site Check', color: 'text-amber-600', bg: 'bg-amber-500', msg: 'Site check required in 2-6 months.' };
+            }
+
+            if ((num >= 2 && size === 'large') || num >= 5) {
+                return { type: 'High Risk', color: 'text-rose-600', bg: 'bg-rose-500', msg: '3 Year Surveillance Colonoscopy.' };
+            } else if (num > 0 || (num === 0 && size === 'large')) { 
+                 return { type: 'Low Risk', color: 'text-emerald-600', bg: 'bg-emerald-500', msg: 'No surveillance. Participate in Bowel Cancer Screening.' };
+            } else {
+                 return { type: 'No Polyps', color: 'text-slate-600', bg: 'bg-slate-500', msg: 'Return to routine screening.' };
+            }
+        };
+
+        const getAnticoagRecommendation = () => {
+            const { med, risk } = anticoagData;
+            if (med === 'aspirin') {
+                return { action: 'Continue', details: 'Aspirin can generally be continued for all diagnostic and therapeutic procedures.', class: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' };
+            }
+            if (med === 'p2y12') { // Clopidogrel
+                if (risk === 'low') return { action: 'Continue', details: 'Continue for low-risk diagnostic procedures + biopsy.', class: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' };
+                return { action: 'Stop 5-7 Days', details: 'Stop 5-7 days prior. Consider aspirin bridge if high thrombotic risk.', class: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' };
+            }
+            if (med === 'warfarin') {
+                if (risk === 'low') return { action: 'Continue', details: 'Ensure INR < 3.0 week of procedure.', class: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' };
+                return { action: 'Stop 5 Days', details: 'Stop 5 days prior. Check INR < 1.5. Bridge if mech valve/high risk.', class: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' };
+            }
+            if (med === 'doac') {
+                if (risk === 'low') return { action: 'Omit Morning Dose', details: 'Take evening before, skip morning of procedure.', class: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' };
+                return { action: 'Stop 3 Days', details: 'Last dose 3 days before procedure (skip 2 days). e.g. Procedure Mon, Last dose Fri.', class: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' };
+            }
+            return { action: 'Consult', details: '', class: 'bg-slate-500' };
+        };
+        
+        async function getOwnerId() {
+            if (!db || !userId) return;
+            try {
+                const docSnap = await getDoc(doc(db, getPublicCollectionPath('app_metadata'), 'ownership'));
+                appOwnerId = (docSnap.exists() && docSnap.data().ownerId) ? docSnap.data().ownerId : userId;
+                if (!docSnap.exists()) {
+                    try { await setDoc(doc(db, getPublicCollectionPath('app_metadata'), 'ownership'), { ownerId: userId }); }
+                    catch(e) { console.warn("Write blocked: cannot initialize app owner."); }
+                }
+            } catch (e) { appOwnerId = userId; }
+        }
+
+        async function seedInitialData() {
+            if (!db || !isAuthReady) return;
+            for (const p of INITIAL_PROCEDURE_DATA) {
+                try {
+                    const ref = doc(db, getPublicCollectionPath('endoscopy_procedures'), p.id);
+                    const snap = await getDoc(ref);
+                    if (!snap.exists()) await setDoc(ref, p);
+                    else { await updateDoc(ref, { accessories: p.accessories }); }
+                } catch(e) { 
+                    console.warn("Seeding failed (Expected if locked):", e.message);
+                    break; 
+                }
+            }
+        }
+
+        function setupRealtimeListener() {
+            if (!db || !isAuthReady) return;
+            onSnapshot(collection(db, getPublicCollectionPath('endoscopy_procedures')), (snap) => {
+                proceduresData = snap.docs.map(d => d.data()).sort((a, b) => a.order - b.order);
+                isLoading = false;
+                permissionError = false;
+                renderApp();
+            }, (error) => { 
+                console.error("Firestore Listener Error:", error);
+                isLoading = false;
+                if (error.code === 'permission-denied') {
+                    permissionError = true;
+                }
+                renderApp(); 
+            });
+        }
+
+        async function saveNewAccessory(procId, data) {
+            if (!db || userId !== appOwnerId) return;
+            const proc = proceduresData.find(p => p.id === procId);
+            if (proc) {
+                try {
+                    const updated = [...proc.accessories, { ...data, id: generateUUID() }];
+                    await updateDoc(doc(db, getPublicCollectionPath('endoscopy_procedures'), procId), { accessories: updated });
+                    showToast('Accessory added successfully');
+                } catch(e) {
+                    showToast('Error: Permission Denied.', 'error');
+                }
+            }
+        }
+
+        async function saveNewProcedure(data) {
+             if (!db || userId !== appOwnerId) return;
+             try {
+                const newOrder = (proceduresData.length > 0 ? Math.max(...proceduresData.map(p => p.order)) : 0) + 1;
+                await setDoc(doc(db, getPublicCollectionPath('endoscopy_procedures'), data.id), { ...data, order: newOrder, accessories: [] });
+                showToast('Procedure created successfully');
+             } catch(e) {
+                showToast('Error: Permission Denied.', 'error');
+             }
+        }
+
+        window.renderAddAccessoryModal = (procedureId, procedureName) => {
+            const modal = document.getElementById('accessory-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+             modal.innerHTML = `
+                <div class="animate-scale-up bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 rounded-t-3xl">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Add to ${procedureName}</h3>
+                        <button id="close-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">${XIcon}</button>
+                    </div>
+                    <form id="add-accessory-form" class="p-6 space-y-5">
+                        <input type="hidden" name="procedureId" value="${procedureId}">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</label>
+                            <input type="text" name="name" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all">
+                        </div>
+                         <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Type</label>
+                                <select name="type" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all">${ACCESORY_TYPES.slice(1).map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Manufacturer</label>
+                                <select name="manufacturer" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all">${ACCESORY_MANUFACTURERS.map(m => `<option value="${m}">${m}</option>`).join('')}</select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                             <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Channel (mm)</label>
+                                <input type="text" name="channel" placeholder="2.8mm" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-2.5 text-sm">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Length (cm)</label>
+                                <input type="text" name="length" placeholder="160cm" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-2.5 text-sm">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Reuse?</label>
+                                <select name="reuse" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-2.5 text-sm">
+                                    <option value="Single-use">Single-use</option>
+                                    <option value="Reusable">Reusable</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Primary Use</label>
+                            <textarea name="use" required rows="2" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all"></textarea>
+                        </div>
+                        <button type="submit" class="w-full flex justify-center py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 transform hover:-translate-y-0.5">Add Accessory</button>
+                    </form>
+                </div>`;
+            document.getElementById('close-modal').onclick = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+            document.getElementById('add-accessory-form').onsubmit = (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+                const pid = data.procedureId; delete data.procedureId;
+                saveNewAccessory(pid, data);
+                modal.classList.add('hidden'); modal.classList.remove('flex');
+            };
+        }
+
+         window.renderAddProcedureModal = () => {
+            const modal = document.getElementById('accessory-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            modal.innerHTML = `
+                <div class="animate-scale-up bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-800">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 rounded-t-3xl">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Add Procedure</h3>
+                        <button id="close-p-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">${XIcon}</button>
+                    </div>
+                    <form id="add-p-form" class="p-6 space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</label>
+                            <input type="text" name="name" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all">
+                        </div>
+                         <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">ID</label>
+                            <input type="text" name="id" required class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Area</label>
+                            <select name="area" class="w-full rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-3 text-sm outline-none focus:border-primary-500">${PROCEDURE_AREAS.slice(1).map(a => `<option value="${a}">${a}</option>`).join('')}</select>
+                        </div>
+                        <button type="submit" class="w-full flex justify-center py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 transform hover:-translate-y-0.5">Create</button>
+                    </form>
+                </div>`;
+             document.getElementById('close-p-modal').onclick = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+             document.getElementById('add-p-form').onsubmit = (e) => {
+                e.preventDefault();
+                saveNewProcedure(Object.fromEntries(new FormData(e.target)));
+                modal.classList.add('hidden'); modal.classList.remove('flex');
+            };
+        }
+
+        function renderAccessoryCard(acc, procName) {
+            const isFav = favorites.has(acc.id);
+            const isErbe = acc.manufacturer === 'ERBE';
+            const typeStyle = isErbe 
+                ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800/50' 
+                : 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 border-primary-100 dark:border-primary-800/50';
+            
+            const specsHtml = (acc.channel || acc.length) 
+                ? `<div class="mt-3 flex flex-wrap gap-2">
+                     ${acc.channel ? `<span class="px-2 py-1 rounded-md text-[10px] font-bold font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">⌀ ${acc.channel}</span>` : ''}
+                     ${acc.length ? `<span class="px-2 py-1 rounded-md text-[10px] font-bold font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">L: ${acc.length}</span>` : ''}
+                     ${acc.reuse ? `<span class="px-2 py-1 rounded-md text-[10px] font-bold font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">${acc.reuse}</span>` : ''}
+                   </div>` 
+                : '';
+
+            return `
+                <div class="animate-fade-in bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:shadow-primary-900/5 hover:border-primary-200 dark:hover:border-primary-800 transform hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group relative">
+                    <button onclick="window.toggleFavorite('${acc.id}')" class="absolute top-4 right-4 text-slate-300 dark:text-slate-600 hover:text-yellow-400 dark:hover:text-yellow-400 hover:scale-110 transition duration-200 ${isFav ? 'text-yellow-400 dark:text-yellow-400 fill-current' : ''}">
+                        ${StarIcon}
+                    </button>
+                    <div>
+                        <div class="flex items-start justify-between mb-3 pr-8">
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">${acc.name}</h4>
+                        </div>
+                        <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${typeStyle} uppercase tracking-wide mb-3">${acc.type}</span>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mb-1.5 font-bold uppercase tracking-wider">${acc.manufacturer}</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">${acc.use}</p>
+                        ${specsHtml}
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity">
+                         <a href="${getMockVideoUrl(acc.name)}" target="_blank" class="flex items-center text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-red-500 transition group/link p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20">
+                           ${YoutubeIcon}<span class="group-hover/link:underline ml-1.5">Video</span>
+                        </a>
+                        <a href="${getJAGGuidelinesUrl(acc.name)}" target="_blank" class="flex items-center text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-green-500 transition group/link p-1.5 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20">
+                            ${FileTextIcon}<span class="group-hover/link:underline ml-1.5">Guide</span>
+                        </a>
+                    </div>
+                </div>`;
+        }
+
+        function renderDirectorySection() {
+            if (permissionError) {
+                return `
+                <div class="flex flex-col items-center justify-center py-24 px-6 text-center space-y-4">
+                    <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">Permission Error</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Your database rules are currently blocking read access. Ensure your rules allow public reading in the Firebase Console.</p>
+                </div>`;
+            }
+
+            let filtered = proceduresData.filter(p => selectedAreaFilter === 'All' || p.area === selectedAreaFilter || (selectedAreaFilter === 'Other' && !['Upper GI', 'Lower GI', 'Advanced'].includes(p.area)));
+            const term = searchTerm.toLowerCase();
+            if (term) filtered = filtered.filter(p => p.name.toLowerCase().includes(term) || p.accessories.some(a => a.name.toLowerCase().includes(term)));
+
+            if (showFavoritesOnly) {
+                filtered = filtered.map(p => ({ ...p, accessories: p.accessories.filter(a => favorites.has(a.id)) })).filter(p => p.accessories.length > 0);
+            }
+
+            if (filtered.length === 0) return `<div class="text-center py-32 px-6 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600"><div class="text-4xl mb-4 opacity-50">🔍</div><div class="font-medium">No procedures found matching your criteria.</div></div>`;
+
+            const isOwner = userId === appOwnerId;
+
+            return `<div class="p-4 md:p-6 space-y-4">
+                ${filtered.map(p => {
+                    const isOpen = expandedProcedures.has(p.id) || term.length > 0 || showFavoritesOnly;
+                    const accs = p.accessories.filter(a => selectedFilter === 'All' || a.type === selectedFilter);
+                    if (accs.length === 0) return '';
+                    
+                    return `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:border-primary-200 dark:hover:border-primary-800">
+                        <button onclick="window.toggleProc('${p.id}')" class="w-full text-left p-4 flex justify-between items-center ${isOpen ? 'bg-slate-50/50 dark:bg-slate-800/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'} transition-colors duration-200">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-xl mr-4 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-primary-100 dark:ring-primary-800/50">${ActivityIcon}</div>
+                                <div>
+                                    <h2 class="text-base font-bold text-slate-800 dark:text-slate-200 tracking-tight">${p.name}</h2>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">${p.area} • <span class="text-primary-600 dark:text-primary-400 font-bold">${accs.length} items</span></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                ${isOwner ? `<div onclick="event.stopPropagation(); window.renderAddAccessoryModal('${p.id}','${p.name}')" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-primary-500 transition">${PlusIcon}</div>` : ''}
+                                <div class="text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary-500' : ''}">${ChevronDownIcon}</div>
+                            </div>
+                        </button>
+                        ${isOpen ? `
+                        <div class="border-t border-slate-100 dark:border-slate-800 p-5 bg-slate-50/30 dark:bg-slate-950/30 animate-slide-down origin-top">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                                ${accs.map(a => renderAccessoryCard(a, p.name)).join('')}
+                            </div>
+                        </div>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }
+
+        function renderCalculatorsSection() {
+            const tabs = [
+                { id: 'gbs', label: 'Glasgow-Blatchford' },
+                { id: 'rockall', label: 'Rockall Score' },
+                { id: 'bbps', label: 'Bowel Prep (BBPS)' },
+                { id: 'bsg', label: 'Polyp Surveillance' },
+                { id: 'anticoag', label: 'Anticoagulants' }
+            ];
+
+            const renderTabBar = () => `
+                <div class="flex overflow-x-auto no-scrollbar space-x-2 pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
+                    ${tabs.map(t => `
+                        <button onclick="window.setTool('${t.id}')" 
+                            class="px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${activeTool === t.id 
+                                ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md' 
+                                : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}">
+                            ${t.label}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            let toolContent = '';
+
+            if (activeTool === 'gbs') {
+                const score = calculateGBS();
+                let risk = 'Low Risk';
+                let riskColor = 'text-emerald-600 dark:text-emerald-400';
+                let barColor = 'bg-emerald-500';
+                let percentage = Math.min((score / 23) * 100, 100); 
+
+                if (score > 0) { 
+                    risk = 'High Risk (Consider Admission)'; 
+                    riskColor = 'text-rose-600 dark:text-rose-400'; 
+                    barColor = 'bg-rose-500';
+                }
+
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 space-y-8 animate-fade-in">
+                        <div class="text-center p-6 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                            <div class="text-7xl font-extrabold ${riskColor} mb-2 tracking-tighter">${score}</div>
+                            <div class="text-xs font-bold uppercase tracking-widest ${riskColor}">${risk}</div>
+                            
+                            <div class="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-full mt-6 overflow-hidden p-1">
+                                <div class="h-full rounded-full ${barColor} transition-all duration-1000 ease-out shadow-sm" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                             <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hb (g/L)</label>
+                                <input type="number" oninput="window.updateGBS('hb', this.value)" value="${gbsScoreData.hb}" class="w-full p-3.5 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium">
+                             </div>
+                             <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Urea (mmol/L)</label>
+                                <input type="number" oninput="window.updateGBS('urea', this.value)" value="${gbsScoreData.urea}" class="w-full p-3.5 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium">
+                             </div>
+                             <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Systolic BP</label>
+                                <input type="number" oninput="window.updateGBS('sbp', this.value)" value="${gbsScoreData.sbp}" class="w-full p-3.5 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium">
+                             </div>
+                             <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pulse</label>
+                                <input type="number" oninput="window.updateGBS('pulse', this.value)" value="${gbsScoreData.pulse}" class="w-full p-3.5 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium">
+                             </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-slate-100 dark:border-slate-800">
+                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Clinical Signs</label>
+                             <div class="grid grid-cols-2 gap-4">
+                                ${['melena', 'syncope', 'hepatic', 'cardiac'].map(key => `
+                                    <label class="flex items-center space-x-3 cursor-pointer p-3.5 rounded-xl border border-transparent bg-slate-50 dark:bg-slate-800/50 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all group">
+                                        <input type="checkbox" onchange="window.updateGBS('${key}', this.checked)" ${gbsScoreData[key]?'checked':''} class="w-5 h-5 rounded-md text-primary-600 focus:ring-primary-500 border-gray-300">
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors capitalize">${key === 'hepatic' ? 'Hepatic Disease' : key === 'cardiac' ? 'Heart Failure' : key}</span>
+                                    </label>
+                                `).join('')}
+                             </div>
+                        </div>
+
+                         <div class="pt-2">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Gender</label>
+                            <div class="flex space-x-4 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-xl inline-flex border border-slate-100 dark:border-slate-700">
+                                <button onclick="window.updateGBS('gender', 'male')" class="flex-1 px-8 py-2.5 rounded-lg text-sm font-bold transition-all ${gbsScoreData.gender === 'male' ? 'bg-white dark:bg-slate-700 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}">Male</button>
+                                <button onclick="window.updateGBS('gender', 'female')" class="flex-1 px-8 py-2.5 rounded-lg text-sm font-bold transition-all ${gbsScoreData.gender === 'female' ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 shadow-sm ring-1 ring-slate-200 dark:ring-slate-600' : 'text-slate-500 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}">Female</button>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (activeTool === 'rockall') {
+                const score = calculateRockall();
+                const mortality = score < 3 ? 'Low Risk' : score < 8 ? 'Moderate Risk' : 'High Risk';
+                const mortalityColor = score < 3 ? 'text-emerald-500' : score < 8 ? 'text-amber-500' : 'text-rose-500';
+
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 space-y-8 animate-fade-in">
+                         <div class="text-center p-6 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                            <div class="text-7xl font-extrabold ${mortalityColor} mb-2 tracking-tighter">${score}</div>
+                            <div class="text-xs font-bold uppercase tracking-widest ${mortalityColor}">${mortality}</div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Age</label>
+                                <select onchange="window.updateRockall('age', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="0" ${rockallData.age===0?'selected':''}>&lt; 60 years (0)</option>
+                                    <option value="1" ${rockallData.age===1?'selected':''}>60 - 79 years (1)</option>
+                                    <option value="2" ${rockallData.age===2?'selected':''}>&ge; 80 years (2)</option>
+                                </select>
+                            </div>
+                             <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Shock</label>
+                                <select onchange="window.updateRockall('shock', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="0" ${rockallData.shock===0?'selected':''}>No Shock (BP &ge;100, Pulse &lt;100) (0)</option>
+                                    <option value="1" ${rockallData.shock===1?'selected':''}>Tachycardia (Pulse &ge;100, BP &ge;100) (1)</option>
+                                    <option value="2" ${rockallData.shock===2?'selected':''}>Hypotension (BP &lt;100) (2)</option>
+                                </select>
+                            </div>
+                             <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Comorbidity</label>
+                                <select onchange="window.updateRockall('comorbid', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="0" ${rockallData.comorbid===0?'selected':''}>None (0)</option>
+                                    <option value="2" ${rockallData.comorbid===2?'selected':''}>Heart Failure, IHD, Major Morbidity (2)</option>
+                                    <option value="3" ${rockallData.comorbid===3?'selected':''}>Renal/Liver Failure, Metastatic Cancer (3)</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Diagnosis</label>
+                                <select onchange="window.updateRockall('diag', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="0" ${rockallData.diag===0?'selected':''}>Mallory-Weiss / No lesion (0)</option>
+                                    <option value="1" ${rockallData.diag===1?'selected':''}>All other diagnoses (1)</option>
+                                    <option value="2" ${rockallData.diag===2?'selected':''}>Malignancy of Upper GI (2)</option>
+                                </select>
+                            </div>
+                             <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Stigmata of Hemorrhage</label>
+                                <select onchange="window.updateRockall('stigmata', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="0" ${rockallData.stigmata===0?'selected':''}>None / Clean Base (0)</option>
+                                    <option value="2" ${rockallData.stigmata===2?'selected':''}>Blood, Clot, Visible Vessel, Active Bleed (2)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'bbps') {
+                const score = calculateBBPS();
+                const adequate = score >= 6 && bbpsData.right >= 2 && bbpsData.transverse >= 2 && bbpsData.left >= 2;
+                const status = adequate ? 'Adequate Preparation' : 'Inadequate Preparation';
+                const statusColor = adequate ? 'text-emerald-500' : 'text-rose-500';
+
+                toolContent = `
+                   <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 space-y-8 animate-fade-in">
+                         <div class="text-center p-6 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                            <div class="text-7xl font-extrabold ${statusColor} mb-2 tracking-tighter">${score}<span class="text-3xl text-slate-300">/9</span></div>
+                            <div class="text-xs font-bold uppercase tracking-widest ${statusColor}">${status}</div>
+                        </div>
+
+                        <div class="space-y-6">
+                            ${['Right Colon', 'Transverse Colon', 'Left Colon'].map((segment, idx) => {
+                                const key = segment.split(' ')[0].toLowerCase();
+                                const val = bbpsData[key];
+                                return `
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-end">
+                                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${segment}</label>
+                                        <span class="text-sm font-bold text-slate-800 dark:text-white">${val}</span>
+                                    </div>
+                                    <input type="range" min="0" max="3" step="1" value="${val}" oninput="window.updateBBPS('${key}', this.value)" class="w-full accent-primary-600 cursor-pointer">
+                                    <div class="flex justify-between text-[10px] text-slate-400 font-bold uppercase">
+                                        <span>0 (Solid Stool)</span>
+                                        <span>3 (Clean)</span>
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-500 dark:text-slate-400">
+                            <strong>Note:</strong> Total score &ge;6 with all segments &ge;2 is generally considered adequate for screening.
+                        </div>
+                   </div>
+                `;
+            } else if (activeTool === 'bsg') {
+                const result = getBSGRecommendation();
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 space-y-8 animate-fade-in">
+                         <div class="text-center p-6 ${result.bg} bg-opacity-10 rounded-2xl border border-${result.bg} border-opacity-20">
+                            <div class="text-lg font-extrabold ${result.color} mb-1">${result.type}</div>
+                            <div class="text-sm font-bold text-slate-700 dark:text-slate-300">${result.msg}</div>
+                        </div>
+
+                        <div class="space-y-5">
+                             <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Number of Premalignant Polyps</label>
+                                <input type="number" min="0" placeholder="e.g. 2" oninput="window.updateBSG('num', this.value)" value="${bsgData.num}" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                <p class="text-[10px] text-slate-400">Adenomas or Serrated Lesions</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Largest Polyp Size</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="window.updateBSG('size', 'small')" class="p-3 rounded-xl border text-sm font-bold transition-all ${bsgData.size === 'small' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}">&lt; 10mm</button>
+                                    <button onclick="window.updateBSG('size', 'large')" class="p-3 rounded-xl border text-sm font-bold transition-all ${bsgData.size === 'large' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}">&ge; 10mm</button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-transparent bg-slate-50 dark:bg-slate-800/50 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all">
+                                    <input type="checkbox" onchange="window.updateBSG('piecemeal', this.checked)" ${bsgData.piecemeal?'checked':''} class="w-5 h-5 rounded-md text-primary-600 focus:ring-primary-500 border-gray-300">
+                                    <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Piecemeal resection of polyp &ge; 20mm?</span>
+                                </label>
+                            </div>
+                        </div>
+                         <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-500 dark:text-slate-400">
+                            <strong>Based on BSG 2019 Guidelines.</strong> Premalignant polyps include Adenomas and Serrated lesions (SSL/TSA).
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'anticoag') {
+                const rec = getAnticoagRecommendation();
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 space-y-8 animate-fade-in">
+                         <div class="text-center p-6 ${rec.class} bg-opacity-10 rounded-2xl border border-opacity-20 border-transparent">
+                            <div class="text-2xl font-extrabold ${rec.text} mb-2">${rec.action}</div>
+                            <div class="text-sm font-bold text-slate-700 dark:text-slate-300 max-w-sm mx-auto leading-relaxed">${rec.details}</div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Medication</label>
+                                <select onchange="window.updateAnticoag('med', this.value)" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none">
+                                    <option value="aspirin" ${anticoagData.med==='aspirin'?'selected':''}>Aspirin</option>
+                                    <option value="p2y12" ${anticoagData.med==='p2y12'?'selected':''}>Clopidogrel / Ticagrelor / Prasugrel</option>
+                                    <option value="warfarin" ${anticoagData.med==='warfarin'?'selected':''}>Warfarin</option>
+                                    <option value="doac" ${anticoagData.med==='doac'?'selected':''}>DOAC (Apixaban, Rivaroxaban, etc.)</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Procedure Risk</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="window.updateAnticoag('risk', 'low')" class="p-3 rounded-xl border text-sm font-bold transition-all ${anticoagData.risk === 'low' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}">
+                                        Low Risk
+                                        <span class="block text-[9px] font-normal mt-1 opacity-70">Diagnostic EGD/Col, Biopsy</span>
+                                    </button>
+                                    <button onclick="window.updateAnticoag('risk', 'high')" class="p-3 rounded-xl border text-sm font-bold transition-all ${anticoagData.risk === 'high' ? 'bg-slate-800 dark:bg-white text-white dark:text-slate-900 border-transparent' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}">
+                                        High Risk
+                                        <span class="block text-[9px] font-normal mt-1 opacity-70">Polypectomy, ERCP, EUS-FNA</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-500 dark:text-slate-400">
+                            <strong>Reference:</strong> BSG/ESGE Guidelines on anticoagulant and antiplatelet drugs in endoscopy (2021). Always consult specific patient history (e.g. Mechanical Valve, Recent Stent).
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+            <div class="p-6 md:p-10 animate-fade-in min-h-screen">
+                <div class="max-w-2xl mx-auto">
+                    ${renderTabBar()}
+                    ${toolContent}
+                </div>
+            </div>`;
+        }
+
+        function renderApp() {
+            if (!window.renderApp) window.renderApp = renderApp;
+
+            const app = document.getElementById('app');
+            const isOwner = userId === appOwnerId;
+
+            const controlsHtml = (currentView === 'directory' && !permissionError) ? `
+                <div class="sticky top-[88px] z-20 glass-header shadow-sm transition-all animate-fade-in border-t border-slate-100 dark:border-slate-800" id="header-controls">
+                    <div class="flex flex-col md:flex-row gap-4 p-4 md:px-6 md:pt-4 md:pb-3">
+                        <div class="relative flex-grow group">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors">${SearchIcon}</span>
+                            <input type="text" id="search-input" oninput="window.setSearch(this.value)" value="${searchTerm}" placeholder="Search accessories..." 
+                                class="w-full py-3 pl-11 pr-11 rounded-2xl bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm font-medium"> 
+                            <button id="search-clear-btn" onclick="window.setSearch(''); document.getElementById('search-input').focus();" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ${searchTerm ? '' : 'hidden opacity-0'}">
+                                ${XIcon}
+                            </button>
+                        </div>
+                        <button onclick="window.toggleFavoritesFilter()" class="p-3 rounded-2xl border transition-all ${showFavoritesOnly ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700 shadow-inner' : 'bg-slate-100/70 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}" title="My Kit">
+                            ${StarIcon}
+                        </button>
+                    </div>
+                    <div class="px-4 md:px-6 pb-4 overflow-x-auto no-scrollbar flex space-x-2.5">
+                        ${PROCEDURE_AREAS.map(area => `
+                            <button onclick="window.setAreaFilter('${area}')" 
+                                class="px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 transform active:scale-95 ${area === selectedAreaFilter ? 'bg-slate-800 dark:bg-primary-600 text-white shadow-md shadow-slate-800/20 dark:shadow-primary-600/30' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}" style="touch-action: manipulation">
+                                ${area}
+                            </button>`).join('')}
+                    </div>
+                </div>` : '';
+
+            let content = '';
+            if (isLoading) content = `<div class="py-32 flex flex-col items-center justify-center space-y-5 animate-fade-in"><div class="w-14 h-14 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-primary-500 animate-spin"></div><p class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest animate-pulse-subtle">Loading Directory...</p></div>`;
+            else if (currentView === 'directory') content = renderDirectorySection();
+            else if (currentView === 'calculators') content = renderCalculatorsSection();
+            else content = `<div class="p-12 text-center text-slate-400 font-medium animate-fade-in">Guidelines View (Coming Soon)</div>`;
+
+            const navBtn = (view, label, icon) => 
+                `<button onclick="window.setView('${view}')" class="relative flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${currentView === view ? 'bg-white dark:bg-slate-700 text-primary-700 dark:text-primary-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'}">
+                    ${icon ? `<span class="mr-2">${icon}</span>` : ''}${label}
+                </button>`;
+
+            app.innerHTML = `
+                <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-30 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center gap-4 mb-4 md:mb-0 self-start md:self-auto w-full md:w-auto justify-between md:justify-start">
+                         <div class="flex items-center gap-4">
+                             <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                             </div>
+                             <div>
+                                <h1 class="text-lg font-extrabold text-slate-900 dark:text-white leading-none tracking-tight">Endoscopy<span class="text-primary-600 dark:text-primary-400">Directory</span></h1>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Clinical Guide</p>
+                             </div>
+                         </div>
+                         
+                         <div class="md:hidden flex items-center gap-2">
+                            <button onclick="window.toggleDarkMode()" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                ${isDarkMode ? SunIcon : MoonIcon}
+                            </button>
+                         </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm self-stretch md:self-auto justify-center">
+                        ${navBtn('directory', 'Procedures', null)}
+                        ${navBtn('calculators', 'Tools', CalculatorIcon)}
+                    </div>
+
+                    <div class="hidden md:flex items-center space-x-3">
+                        ${isOwner ? `<span class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-[10px] font-bold rounded-lg border border-primary-100 dark:border-primary-800/50 animate-fade-in uppercase tracking-wider">Admin</span>` : ''}
+                        
+                        <button onclick="window.toggleDarkMode()" class="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition hover:text-slate-800 dark:hover:text-white">
+                            ${isDarkMode ? SunIcon : MoonIcon}
+                        </button>
+                        ${isOwner && currentView === 'directory' ? `<button onclick="window.renderAddProcedureModal()" class="px-5 py-2.5 bg-slate-900 dark:bg-primary-600 hover:bg-slate-800 dark:hover:bg-primary-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-slate-900/10 transition-all transform hover:-translate-y-0.5 tracking-wide uppercase">New</button>` : ''}
+                    </div>
+                </div>
+                ${controlsHtml}
+                <div id="main-content-area" class="flex-grow bg-slate-50 dark:bg-slate-950/50">${content}</div>
+                <div class="py-6 text-center text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                    Designed by Darryl James Tolentino and Gemini
+                </div>
+                ${isOwner && currentView === 'directory' ? `<button onclick="window.renderAddProcedureModal()" class="md:hidden fixed bottom-6 right-6 w-16 h-16 bg-primary-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 text-3xl hover:bg-primary-700 active:scale-90 transition-all animate-scale-up shadow-primary-600/30">+</button>` : ''}
+            `;
+        }
+        
+        async function init() {
+            window.renderApp = renderApp;
+            try {
+                let firebaseConfig;
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    firebaseConfig = JSON.parse(__firebase_config);
+                } else {
+                    /*
+                     * SECURITY NOTICE FOR GITHUB PAGES:
+                     * Replace the placeholders below with your actual keys from Firebase Console.
+                     * Then, in Google Cloud Console Credentials page, restrict your API key to only work on your domain.
+                     */
+                    firebaseConfig = {
+                        apiKey: "PASTE_YOUR_API_KEY_HERE",
+                        authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+                        projectId: "PASTE_YOUR_PROJECT_ID_HERE",
+                        storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
+                        messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+                        appId: "PASTE_YOUR_APP_ID_HERE",
+                        measurementId: "PASTE_YOUR_MEASUREMENT_ID_HERE"
+                    };
+                }
+
+                if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("PASTE_YOUR")) {
+                    console.warn("Firebase credentials missing.");
+                    isLoading = false;
+                    const appEl = document.getElementById('app');
+                    appEl.innerHTML = `<div class="flex flex-col items-center justify-center h-[50vh] p-10 text-center space-y-4"><div class="p-4 bg-amber-50 text-amber-700 rounded-2xl border border-amber-200 max-w-md"><h2 class="font-bold text-lg mb-2">Setup Required</h2><p class="text-sm">Please paste your actual Firebase credentials in the code for GitHub hosting.</p></div></div>`;
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // RULE 3 - AUTH FIRST: Use custom token for preview environment, anonymous for standalone
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) { 
+                        userId = user.uid; 
+                        appOwnerId = user.uid; 
+                        isAuthReady = true; 
+                        
+                        // Seed logic wrapped in try-catch to ignore permission errors if DB is read-only
+                        try {
+                             const testDoc = doc(db, getPublicCollectionPath('endoscopy_procedures'), 'EGD');
+                             const snap = await getDoc(testDoc);
+                             if (!snap.exists()) await seedInitialData();
+                        } catch(err) {
+                             console.warn("Read-only or restricted access. Continuing with standard data fetch...");
+                        }
+                        
+                        await getOwnerId();
+                        setupRealtimeListener(); 
+                    } else { 
+                        userId = null; 
+                        isLoading = false; 
+                        renderApp(); 
+                    }
+                });
+
+            } catch (e) { 
+                console.error("Firebase Init Error:", e);
+                isLoading = false; 
+                renderApp(); 
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
