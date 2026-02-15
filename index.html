@@ -252,10 +252,8 @@
         const getPublicCollectionPath = (collectionName) => {
             const appId = typeof __app_id !== 'undefined' ? __app_id : null;
             if (appId) {
-                // Shared Preview Environment Path
                 return `artifacts/${appId}/public/data/${collectionName}`;
             }
-            // Standalone Path
             return collectionName;
         };
 
@@ -1033,22 +1031,19 @@
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     firebaseConfig = JSON.parse(__firebase_config);
                 } else {
-                    /*
-                     * SECURITY NOTICE FOR GITHUB PAGES:
-                     * Replace the placeholders below with your actual keys from Firebase Console.
-                     * Then, in Google Cloud Console Credentials page, restrict your API key to only work on your domain.
-                     */
+                    // Integrated User Config for Standalone
                     firebaseConfig = {
-                        apiKey: "PASTE_YOUR_API_KEY_HERE",
-                        authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-                        projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-                        storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-                        messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-                        appId: "PASTE_YOUR_APP_ID_HERE",
-                        measurementId: "PASTE_YOUR_MEASUREMENT_ID_HERE"
+                        apiKey: "AIzaSyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0",
+                        authDomain: "gi-endo-directory.firebaseapp.com",
+                        projectId: "gi-endo-directory",
+                        storageBucket: "gi-endo-directory.firebasestorage.app",
+                        messagingSenderId: "1041835888935",
+                        appId: "1:1041835888935:web:1782834489611665cf9902",
+                        measurementId: "G-69TRT9Z7KC"
                     };
                 }
 
+                // Guard: Don't initialize if keys are placeholders
                 if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("PASTE_YOUR")) {
                     console.warn("Firebase credentials missing.");
                     isLoading = false;
@@ -1061,7 +1056,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // RULE 3 - AUTH FIRST: Use custom token for preview environment, anonymous for standalone
+                // AUTH FIRST
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -1074,13 +1069,13 @@
                         appOwnerId = user.uid; 
                         isAuthReady = true; 
                         
-                        // Seed logic wrapped in try-catch to ignore permission errors if DB is read-only
+                        // Seed logic wrapped in try-catch to ignore permission errors if DB is restricted
                         try {
                              const testDoc = doc(db, getPublicCollectionPath('endoscopy_procedures'), 'EGD');
                              const snap = await getDoc(testDoc);
                              if (!snap.exists()) await seedInitialData();
                         } catch(err) {
-                             console.warn("Read-only or restricted access. Continuing with standard data fetch...");
+                             console.warn("Read-only access mode enabled. Fetching data...");
                         }
                         
                         await getOwnerId();
