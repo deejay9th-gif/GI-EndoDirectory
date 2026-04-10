@@ -252,7 +252,7 @@
             { id: 'PSEUDOCYST', name: 'Pancreatic Pseudocyst', area: 'Advanced', description: 'Fluid collection that forms after acute or chronic pancreatitis.', findings: 'Extrinsic compression on EGD; EUS shows a distinct fluid-filled cavity adjacent to the stomach/duodenum.', guidelines: 'EUS-guided transluminal drainage using double pigtail plastic stents or Lumen-Apposing Metal Stents (LAMS).' },
             { id: 'PSC', name: 'Primary Sclerosing Cholangitis (PSC)', area: 'Advanced', description: 'Chronic liver disease causing inflammation and strictures of bile ducts.', findings: '"Beaded" appearance of the bile ducts on fluoroscopy during ERCP, with multiple strictures.', guidelines: 'ERCP for balloon dilation of dominant strictures and brushings to rule out cholangiocarcinoma. Annual colonoscopy (high association with UC).' }
         ];
-        
+
         const INITIAL_PROCEDURE_DATA = [
              { id: 'EGD', name: 'EGD (Upper Endoscopy)', area: 'Upper GI', order: 1, accessories: [
                 { id: 'biopsy_forceps', name: 'Standard Biopsy Forceps', type: 'Diagnostic', manufacturer: 'Olympus', use: 'Collecting routine tissue samples from mucosa.', channel: '2.8mm', length: '160cm', reuse: 'Single-use' },
@@ -1300,7 +1300,7 @@
                     firebaseConfig = JSON.parse(__firebase_config);
                 } else {
                     firebaseConfig = {
-                        apiKey: "AIza" + "SyDD-CCEjo4Rsor0GChLOYib3UooxnvFzmY", 
+                        apiKey: "AIza" + "SyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0", 
                         authDomain: "gi-endo-directory.firebaseapp.com",
                         projectId: "gi-endo-directory",
                         storageBucket: "gi-endo-directory.firebasestorage.app",
@@ -1310,7 +1310,7 @@
                     };
                 }
 
-                if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("AIzaSyDD-CCEjo4Rsor0GChLOYib3UooxnvFzmY")) {
+                if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("PASTE_YOUR_")) {
                     console.warn("Firebase credentials missing.");
                     isLoading = false;
                     const appEl = document.getElementById('app');
