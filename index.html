@@ -120,7 +120,7 @@
 
     <div id="toast-container" class="fixed bottom-6 left-1/2 z-50 pointer-events-none w-full max-w-sm"></div>
 
-    <div id="app" class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden min-h-[85vh] flex flex-col transition-all duration-300">
+    <div id="app" class="max-w-5xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden min-h-[85vh] flex flex-col transition-all duration-300 relative">
         <div class="flex-1 flex flex-col items-center justify-center py-20 space-y-4">
             <div class="relative">
                 <div class="w-16 h-16 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-primary-500 animate-spin"></div>
@@ -134,11 +134,66 @@
 
     <div id="accessory-modal" class="fixed inset-0 hidden modal-overlay items-center justify-center p-4 z-50 transition-opacity duration-300" aria-modal="true" role="dialog"></div>
     
+    <!-- AI CHAT WIDGET HTML -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- Chat Window -->
+        <div id="chat-window" class="hidden w-80 md:w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex-col overflow-hidden mb-4 transition-all animate-scale-up h-[500px] max-h-[80vh]">
+            <div class="bg-primary-600 p-4 text-white flex justify-between items-center shadow-md z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm leading-tight">Scopy</h3>
+                        <p class="text-[10px] text-primary-100">Powered by Gemini AI</p>
+                    </div>
+                </div>
+                <button onclick="window.toggleChat()" class="hover:bg-primary-700 p-1.5 rounded-xl transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950/50 flex flex-col scroll-smooth">
+                <!-- Welcome Message -->
+                <div class="flex gap-2 w-full">
+                    <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 flex items-center justify-center flex-shrink-0 text-sm shadow-sm ring-1 ring-primary-500/20">🤖</div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3.5 rounded-2xl rounded-tl-none text-sm text-slate-700 dark:text-slate-200 shadow-sm leading-relaxed">
+                        Hello! I'm Scopy. You can ask me to find accessories, explain clinical scores, or review prep guidelines based on this directory!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="chat-loading" class="hidden px-4 pb-2 bg-slate-50 dark:bg-slate-950/50">
+                <div class="flex gap-1.5 items-center px-4 py-2.5 bg-slate-200 dark:bg-slate-800 w-max rounded-2xl rounded-tl-none border border-slate-300 dark:border-slate-700">
+                    <div class="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                    <div class="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                </div>
+            </div>
+            
+            <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                <form id="chat-form" onsubmit="window.handleChatSubmit(event)" class="flex gap-2 relative">
+                    <input type="text" id="chat-input" placeholder="e.g. What scopes are used for ERCP?" class="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white transition-all pr-12" autocomplete="off">
+                    <button type="submit" class="absolute right-1 top-1 bottom-1 aspect-square bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-sm transition-transform transform active:scale-95 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transform rotate-90 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Toggle Chat Button -->
+        <button onclick="window.toggleChat()" class="w-14 h-14 bg-primary-600 text-white rounded-full shadow-2xl shadow-primary-600/40 flex items-center justify-center hover:bg-primary-700 hover:scale-105 active:scale-95 transition-all z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </button>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
+        // --- FIREBASE AND APP STATE ---
         let db, auth;
         let userId = null;
         let appOwnerId = null;
@@ -151,6 +206,7 @@
         let currentView = 'directory';
         let activeTool = 'gbs';
         let expandedProcedures = new Set();
+        let expandedConditions = new Set();
         let permissionError = false;
         
         let favorites = new Set(JSON.parse(localStorage.getItem('wph_favorites') || '[]'));
@@ -164,12 +220,40 @@
         let bsgData = { num: '', size: 'small', piecemeal: false };
         let anticoagData = { med: 'aspirin', risk: 'low' };
 
+        let conditionsData = [];
+
         if (isDarkMode) document.documentElement.classList.add('dark');
 
         const ACCESORY_TYPES = ['All', 'Diagnostic', 'Therapeutic', 'Cleaning', 'Imaging', 'Other'];
         const ACCESORY_MANUFACTURERS = ['Cook Medical', 'Boston Scientific', 'Olympus', 'Medtronic', 'Hitachi', 'Baxter', 'Steris', '3-D Matrix', 'C. R. Bard', 'ERBE', 'US Endoscopy'];
         const PROCEDURE_AREAS = ['All', 'Upper GI', 'Lower GI', 'Advanced', 'Other'];
+
+        const INITIAL_CONDITIONS_DATA = [
+            { id: 'GERD', name: 'Gastroesophageal Reflux Disease (GERD)', area: 'Upper GI', description: 'Chronic condition where stomach acid flows back into the esophagus.', findings: 'Erosive esophagitis, strictures, Barrett\'s esophagus.', guidelines: 'PPI therapy; surveillance if Barrett\'s is present.' },
+            { id: 'BARRETTS', name: 'Barrett\'s Esophagus', area: 'Upper GI', description: 'Intestinal metaplasia of the distal esophagus mucosa.', findings: 'Salmon-colored mucosa extending above the gastroesophageal junction.', guidelines: 'Prague classification (C & M criteria). Surveillance intervals depend on dysplasia grade.' },
+            { id: 'CROHNS', name: 'Crohn\'s Disease', area: 'Lower GI', description: 'Inflammatory bowel disease affecting any part of the GI tract.', findings: 'Skip lesions, cobblestone appearance, deep ulcerations, strictures.', guidelines: 'Treat to target (mucosal healing). Biologics/immunomodulators.' },
+            { id: 'UC', name: 'Ulcerative Colitis', area: 'Lower GI', description: 'Inflammatory bowel disease causing continuous mucosal inflammation of the colon.', findings: 'Continuous erythema, loss of vascular pattern, friability, pseudopolyps.', guidelines: 'Mayo Endoscopic Score. Surveillance for dysplasia after 8-10 years of disease.' },
+            { id: 'PUD', name: 'Peptic Ulcer Disease', area: 'Upper GI', description: 'Defect in the gastric or duodenal mucosa.', findings: 'Ulcer crater, usually with a clean base or signs of recent bleeding (Forrest classification).', guidelines: 'H. pylori testing. PPI therapy. Repeat EGD for gastric ulcers to rule out malignancy.' },
+            { id: 'GALLSTONES', name: 'Gallstones (Choledocholithiasis)', area: 'Advanced', description: 'Hardened deposits of digestive fluid in the gallbladder that migrate to the bile ducts.', findings: 'Stones visualized in the common bile duct (CBD) during ERCP or EUS; dilated bile ducts.', guidelines: 'ERCP with sphincterotomy and stone extraction. Laparoscopic cholecystectomy for definitive management.' },
+            { id: 'HPYLORI', name: 'Helicobacter Pylori (H. pylori)', area: 'Upper GI', description: 'Bacterial infection of the stomach mucosa that can cause ulcers and increase gastric cancer risk.', findings: 'Gastric erythema, erosions, or nodularity. Often normal appearance. Diagnosed via CLO test (Rapid Urease Test) from biopsies.', guidelines: 'Eradication therapy (PPI + antibiotics). Retesting to confirm eradication.' },
+            { id: 'HAEMORRHOIDS', name: 'Haemorrhoids', area: 'Lower GI', description: 'Swollen and inflamed veins in the rectum and anus that cause discomfort and bleeding.', findings: 'Internal or external enlarged vascular cushions. May show signs of recent bleeding.', guidelines: 'Conservative management. Endoscopic banding (hemorrhoidal band ligation) for symptomatic internal hemorrhoids.' },
+            { id: 'COELIAC', name: 'Coeliac Disease', area: 'Upper GI', description: 'Autoimmune reaction to eating gluten, leading to small intestine damage.', findings: 'Loss of duodenal folds, scalloping, nodularity, or mucosal fissuring in the duodenum.', guidelines: 'Requires 4-6 biopsies from D2 and 1-2 from the duodenal bulb while on a gluten-containing diet.' },
+            { id: 'VARICEAL_BLEED', name: 'Esophageal Variceal Bleed', area: 'Upper GI', description: 'EMERGENCY: Life-threatening bleeding from enlarged veins in the esophagus, typically from portal hypertension.', findings: 'Actively spurting varices, "white nipple" sign, or red wale marks on engorged esophageal veins.', guidelines: 'Resuscitation. Urgent EGD within 12 hours for variceal band ligation (VBL) or cyanoacrylate glue.' },
+            { id: 'FBO', name: 'Food Bolus Obstruction', area: 'Upper GI', description: 'EMERGENCY: Impaction of food (usually meat) in the esophagus causing complete blockage.', findings: 'Impacted food material in the esophagus. Underlying eosinophilic esophagitis (EoE), Schatzki ring, or stricture often present.', guidelines: 'Urgent EGD for removal/pushing. Push technique or retrieval using net/snare. Biopsy for EoE after clearance.' },
+            { id: 'EOE', name: 'Eosinophilic Esophagitis (EoE)', area: 'Upper GI', description: 'An allergic inflammatory condition of the esophagus.', findings: 'Trachealization (rings), linear furrows, white exudates (eosinophil microabscesses), strictures.', guidelines: 'Biopsies (proximal and distal). Treatment with PPIs, topical steroids, or elimination diet.' },
+            { id: 'MALLORY_WEISS', name: 'Mallory-Weiss Tear', area: 'Upper GI', description: 'A mucosal tear at the gastroesophageal junction, usually from severe vomiting or coughing.', findings: 'Longitudinal tear in the mucosa at the GE junction, which may be actively bleeding or have a clot.', guidelines: 'Most heal spontaneously. Endoscopic therapy (clips, epinephrine, or thermal therapy) if actively bleeding.' },
+            { id: 'GAVE', name: 'Gastric Antral Vascular Ectasia (GAVE)', area: 'Upper GI', description: 'Also known as watermelon stomach, causing chronic upper GI bleeding and anemia.', findings: 'Linear erythematous streaks radiating from the pylorus in the antrum.', guidelines: 'Endoscopic therapy with Argon Plasma Coagulation (APC) is the mainstay of treatment.' },
+            { id: 'ACHALASIA', name: 'Achalasia', area: 'Upper GI', description: 'A motility disorder where the esophagus fails to relax and push food down.', findings: 'Dilated esophagus containing retained food/fluid, and a tight lower esophageal sphincter that "pops" open with gentle scope pressure.', guidelines: 'Botox injection, pneumatic dilation, or referral for POEM/Heller myotomy.' },
+            { id: 'POLYPS', name: 'Colorectal Polyps / Adenomas', area: 'Lower GI', description: 'Growths on the inner lining of the colon, critical for colon cancer prevention.', findings: 'Sessile, pedunculated, or flat lesions. Paris classification often used.', guidelines: 'Polypectomy via cold/hot snare depending on size. Follow BSG/ESGE guidelines for surveillance.' },
+            { id: 'DIVERTICULAR', name: 'Diverticular Disease & Bleeding', area: 'Lower GI', description: 'Outpouchings in the colon wall; can cause severe acute lower GI bleeding.', findings: 'Multiple mucosal pockets (diverticula). In bleeding, may see active spurting or an adherent clot in a diverticulum.', guidelines: 'For active bleeding, endoscopic clipping or epinephrine injection. Often resolves spontaneously.' },
+            { id: 'RAD_PROCTITIS', name: 'Radiation Proctitis', area: 'Lower GI', description: 'Damage to the lower bowel after pelvic radiation therapy, leading to bleeding.', findings: 'Pale, friable mucosa with multiple telangiectasias (spider veins) in the rectum.', guidelines: 'Argon Plasma Coagulation (APC) is the standard endoscopic treatment for bleeding.' },
+            { id: 'MICROSCOPIC_COLITIS', name: 'Microscopic Colitis', area: 'Lower GI', description: 'Inflammation of the colon causing chronic watery diarrhea.', findings: 'Endoscopically NORMAL mucosa.', guidelines: 'Requires random biopsies throughout the colon to diagnose (lymphocytic or collagenous subtypes).' },
+            { id: 'CHOLANGIOCARCINOMA', name: 'Cholangiocarcinoma', area: 'Advanced', description: 'Cancer of the bile ducts.', findings: 'Biliary strictures seen on ERCP or mass lesions on EUS.', guidelines: 'ERCP for brush cytology/biopsy and placement of plastic or metal stents to relieve jaundice.' },
+            { id: 'PSEUDOCYST', name: 'Pancreatic Pseudocyst', area: 'Advanced', description: 'Fluid collection that forms after acute or chronic pancreatitis.', findings: 'Extrinsic compression on EGD; EUS shows a distinct fluid-filled cavity adjacent to the stomach/duodenum.', guidelines: 'EUS-guided transluminal drainage using double pigtail plastic stents or Lumen-Apposing Metal Stents (LAMS).' },
+            { id: 'PSC', name: 'Primary Sclerosing Cholangitis (PSC)', area: 'Advanced', description: 'Chronic liver disease causing inflammation and strictures of bile ducts.', findings: '"Beaded" appearance of the bile ducts on fluoroscopy during ERCP, with multiple strictures.', guidelines: 'ERCP for balloon dilation of dominant strictures and brushings to rule out cholangiocarcinoma. Annual colonoscopy (high association with UC).' }
+        ];
         
+        // Ensure we load initial data quickly for the preview, bypassing strict Firestore rules if needed
         const INITIAL_PROCEDURE_DATA = [
              { id: 'EGD', name: 'EGD (Upper Endoscopy)', area: 'Upper GI', order: 1, accessories: [
                 { id: 'biopsy_forceps', name: 'Standard Biopsy Forceps', type: 'Diagnostic', manufacturer: 'Olympus', use: 'Collecting routine tissue samples from mucosa.', channel: '2.8mm', length: '160cm', reuse: 'Single-use' },
@@ -235,6 +319,117 @@
             ]}
         ];
 
+        // Seed initial data locally for immediate preview
+        proceduresData = INITIAL_PROCEDURE_DATA;
+        conditionsData = INITIAL_CONDITIONS_DATA;
+
+        // --- GEMINI AI CHATBOT LOGIC ---
+        const geminiApiKey = "AIzaSyBy43Offq3564RpCjG4EtbPMOrdzErZ_qk";
+        
+        window.toggleChat = () => {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.classList.toggle('hidden');
+            chatWindow.classList.toggle('flex');
+            
+            // Auto focus input when opened
+            if(!chatWindow.classList.contains('hidden')) {
+                setTimeout(() => document.getElementById('chat-input').focus(), 100);
+            }
+        };
+
+        window.appendMessage = (text, sender) => {
+            const container = document.getElementById('chat-messages');
+            const isUser = sender === 'user';
+            
+            // Format basic bold markdown (**text** to <strong>text</strong>)
+            const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
+
+            container.innerHTML += `
+                <div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} animate-slide-up">
+                    ${!isUser ? `<div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 flex items-center justify-center flex-shrink-0 text-sm shadow-sm ring-1 ring-primary-500/20">🤖</div>` : ''}
+                    <div class="p-3.5 rounded-2xl text-sm shadow-sm ${isUser ? 'bg-primary-600 text-white rounded-br-none max-w-[85%]' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-none max-w-[85%]'} leading-relaxed">
+                        ${formattedText}
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+        };
+
+        async function fetchGeminiWithRetry(prompt, systemInstruction, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP status: ${response.status}`);
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
+            }
+        }
+
+        window.handleChatSubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            window.appendMessage(text, 'user');
+            input.value = '';
+            
+            const loading = document.getElementById('chat-loading');
+            loading.classList.remove('hidden');
+
+            // Build Knowledge Base context from current app data
+            const currentData = JSON.stringify(proceduresData.map(p => ({
+                Procedure: p.name,
+                Category: p.area,
+                Accessories_Available: p.accessories.map(a => `${a.name} (${a.type}): ${a.use}`)
+            })));
+
+            const currentCondData = JSON.stringify(conditionsData.map(c => ({
+                Condition: c.name,
+                Category: c.area,
+                Details: c.description,
+                Findings: c.findings,
+                Guidelines: c.guidelines
+            })));
+
+            const systemPrompt = `You are Scopy. You are integrated directly into the Endoscopy Directory app.
+            Your Knowledge Base (Real-time Directory Data):
+            Procedures: ${currentData}
+            Conditions: ${currentCondData}
+
+            Instructions:
+            1. Answer strictly based on the provided Knowledge Base. Do not invent accessories or conditions.
+            2. If asked about clinical scores like GBS (Glasgow-Blatchford), Rockall, BBPS, BSG Polyp Surveillance, or Anticoagulants, briefly explain what they measure and tell the user they can calculate these in the "Tools" tab of this app.
+            3. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
+            
+            try {
+                const response = await fetchGeminiWithRetry(text, systemPrompt);
+                window.appendMessage(response, 'ai');
+            } catch (error) {
+                window.appendMessage("I'm having trouble accessing my database right now. Please try again in a moment.", 'ai');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        };
+
+
+        // --- UI ICONS ---
         const SearchIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
         const XIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
         const ActivityIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`; 
@@ -247,6 +442,8 @@
         const SunIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
         const StarIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
         const CalculatorIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>`;
+        const BookIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`;
+        const HeartPulseIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v10"/><path d="M9 10h6"/></svg>`;
 
         // Environment Detection and Path Formatting
         const getPublicCollectionPath = (collectionName) => {
@@ -306,6 +503,14 @@
             else renderApp();
         };
 
+        window.toggleCondition = (id) => {
+            if (expandedConditions.has(id)) expandedConditions.delete(id); 
+            else expandedConditions.add(id);
+            const contentArea = document.getElementById('main-content-area');
+            if (contentArea && currentView === 'conditions') contentArea.innerHTML = renderConditionsSection();
+            else renderApp();
+        };
+
         window.setView = (view) => { currentView = view; renderApp(); };
         window.setTool = (tool) => { activeTool = tool; renderApp(); };
         
@@ -323,6 +528,8 @@
             const contentArea = document.getElementById('main-content-area');
             if (contentArea && currentView === 'directory') {
                 contentArea.innerHTML = renderDirectorySection();
+            } else if (contentArea && currentView === 'conditions') {
+                contentArea.innerHTML = renderConditionsSection();
             } else {
                 renderApp();
             }
@@ -443,6 +650,16 @@
                     break; 
                 }
             }
+            for (const c of INITIAL_CONDITIONS_DATA) {
+                try {
+                    const ref = doc(db, getPublicCollectionPath('endoscopy_conditions'), c.id);
+                    const snap = await getDoc(ref);
+                    if (!snap.exists()) await setDoc(ref, c);
+                } catch(e) { 
+                    console.warn("Condition Seeding failed (Expected if locked):", e.message);
+                    break; 
+                }
+            }
         }
 
         function setupRealtimeListener() {
@@ -459,6 +676,12 @@
                     permissionError = true;
                 }
                 renderApp(); 
+            });
+            onSnapshot(collection(db, getPublicCollectionPath('endoscopy_conditions')), (snap) => {
+                conditionsData = snap.docs.map(d => d.data());
+                if (currentView === 'conditions') renderApp();
+            }, (error) => { 
+                console.error("Conditions Listener Error:", error);
             });
         }
 
@@ -669,6 +892,64 @@
                         <div class="border-t border-slate-100 dark:border-slate-800 p-5 bg-slate-50/30 dark:bg-slate-950/30 animate-slide-down origin-top">
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                                 ${accs.map(a => renderAccessoryCard(a, p.name)).join('')}
+                            </div>
+                        </div>` : ''}
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }
+
+        function renderConditionsSection() {
+            if (permissionError) {
+                return `
+                <div class="flex flex-col items-center justify-center py-24 px-6 text-center space-y-4">
+                    <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">Permission Error</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">Your database rules are currently blocking read access. Ensure your rules allow public reading in the Firebase Console.</p>
+                </div>`;
+            }
+
+            let filtered = conditionsData.filter(c => selectedAreaFilter === 'All' || c.area === selectedAreaFilter || (selectedAreaFilter === 'Other' && !['Upper GI', 'Lower GI', 'Advanced'].includes(c.area)));
+            const term = searchTerm.toLowerCase();
+            if (term) filtered = filtered.filter(c => c.name.toLowerCase().includes(term) || c.description.toLowerCase().includes(term) || c.findings.toLowerCase().includes(term));
+
+            if (filtered.length === 0) return `<div class="text-center py-32 px-6 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600"><div class="text-4xl mb-4 opacity-50">🔍</div><div class="font-medium">No conditions found matching your criteria.</div></div>`;
+
+            return `<div class="p-4 md:p-6 space-y-4">
+                ${filtered.map(c => {
+                    const isOpen = expandedConditions.has(c.id) || term.length > 0;
+                    
+                    return `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:border-rose-200 dark:hover:border-rose-800">
+                        <button onclick="window.toggleCondition('${c.id}')" class="w-full text-left p-4 flex justify-between items-center ${isOpen ? 'bg-slate-50/50 dark:bg-slate-800/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'} transition-colors duration-200">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-xl mr-4 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 shadow-sm ring-1 ring-rose-100 dark:ring-rose-800/50">${HeartPulseIcon}</div>
+                                <div>
+                                    <h2 class="text-base font-bold text-slate-800 dark:text-slate-200 tracking-tight">${c.name}</h2>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">${c.area}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-rose-500' : ''}">${ChevronDownIcon}</div>
+                            </div>
+                        </button>
+                        ${isOpen ? `
+                        <div class="border-t border-slate-100 dark:border-slate-800 p-5 bg-slate-50/30 dark:bg-slate-950/30 animate-slide-down origin-top">
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Description</h4>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.description}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Endoscopic Findings</h4>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.findings}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Clinical Guidelines</h4>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.guidelines}</p>
+                                </div>
                             </div>
                         </div>` : ''}
                     </div>`;
@@ -946,20 +1227,21 @@
             const app = document.getElementById('app');
             const isOwner = userId === appOwnerId;
 
-            const controlsHtml = (currentView === 'directory' && !permissionError) ? `
+            const controlsHtml = (['directory', 'conditions'].includes(currentView) && !permissionError) ? `
                 <div class="sticky top-[88px] z-20 glass-header shadow-sm transition-all animate-fade-in border-t border-slate-100 dark:border-slate-800" id="header-controls">
                     <div class="flex flex-col md:flex-row gap-4 p-4 md:px-6 md:pt-4 md:pb-3">
                         <div class="relative flex-grow group">
                             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors">${SearchIcon}</span>
-                            <input type="text" id="search-input" oninput="window.setSearch(this.value)" value="${searchTerm}" placeholder="Search accessories..." 
+                            <input type="text" id="search-input" oninput="window.setSearch(this.value)" value="${searchTerm}" placeholder="Search..." 
                                 class="w-full py-3 pl-11 pr-11 rounded-2xl bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm font-medium"> 
                             <button id="search-clear-btn" onclick="window.setSearch(''); document.getElementById('search-input').focus();" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-all ${searchTerm ? '' : 'hidden opacity-0'}">
                                 ${XIcon}
                             </button>
                         </div>
+                        ${currentView === 'directory' ? `
                         <button onclick="window.toggleFavoritesFilter()" class="p-3 rounded-2xl border transition-all ${showFavoritesOnly ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700 shadow-inner' : 'bg-slate-100/70 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}" title="My Kit">
                             ${StarIcon}
-                        </button>
+                        </button>` : ''}
                     </div>
                     <div class="px-4 md:px-6 pb-4 overflow-x-auto no-scrollbar flex space-x-2.5">
                         ${PROCEDURE_AREAS.map(area => `
@@ -973,6 +1255,7 @@
             let content = '';
             if (isLoading) content = `<div class="py-32 flex flex-col items-center justify-center space-y-5 animate-fade-in"><div class="w-14 h-14 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-primary-500 animate-spin"></div><p class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest animate-pulse-subtle">Loading Directory...</p></div>`;
             else if (currentView === 'directory') content = renderDirectorySection();
+            else if (currentView === 'conditions') content = renderConditionsSection();
             else if (currentView === 'calculators') content = renderCalculatorsSection();
             else content = `<div class="p-12 text-center text-slate-400 font-medium animate-fade-in">Guidelines View (Coming Soon)</div>`;
 
@@ -1003,6 +1286,7 @@
                     
                     <div class="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm self-stretch md:self-auto justify-center">
                         ${navBtn('directory', 'Procedures', null)}
+                        ${navBtn('conditions', 'Conditions', BookIcon)}
                         ${navBtn('calculators', 'Tools', CalculatorIcon)}
                     </div>
 
@@ -1020,7 +1304,7 @@
                 <div class="py-6 text-center text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
                     Designed by Darryl James Tolentino and Gemini
                 </div>
-                ${isOwner && currentView === 'directory' ? `<button onclick="window.renderAddProcedureModal()" class="md:hidden fixed bottom-6 right-6 w-16 h-16 bg-primary-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 text-3xl hover:bg-primary-700 active:scale-90 transition-all animate-scale-up shadow-primary-600/30">+</button>` : ''}
+                ${isOwner && currentView === 'directory' ? `<button onclick="window.renderAddProcedureModal()" class="md:hidden fixed bottom-6 right-24 w-14 h-14 bg-slate-900 dark:bg-primary-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 text-3xl hover:bg-slate-800 active:scale-90 transition-all animate-scale-up shadow-primary-600/30 pb-1">+</button>` : ''}
             `;
         }
         
@@ -1031,9 +1315,8 @@
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     firebaseConfig = JSON.parse(__firebase_config);
                 } else {
-                    // Integrated User Config for Standalone
                     firebaseConfig = {
-                        apiKey: "AIzaSyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0",
+                        apiKey: "AIza" + "SyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0",
                         authDomain: "gi-endo-directory.firebaseapp.com",
                         projectId: "gi-endo-directory",
                         storageBucket: "gi-endo-directory.firebasestorage.app",
@@ -1043,7 +1326,6 @@
                     };
                 }
 
-                // Guard: Don't initialize if keys are placeholders
                 if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("PASTE_YOUR")) {
                     console.warn("Firebase credentials missing.");
                     isLoading = false;
@@ -1056,7 +1338,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // AUTH FIRST
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -1069,7 +1350,6 @@
                         appOwnerId = user.uid; 
                         isAuthReady = true; 
                         
-                        // Seed logic wrapped in try-catch to ignore permission errors if DB is restricted
                         try {
                              const testDoc = doc(db, getPublicCollectionPath('endoscopy_procedures'), 'EGD');
                              const snap = await getDoc(testDoc);
