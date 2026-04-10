@@ -399,14 +399,15 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error("Network response was not ok");
+                    const errText = await response.text();
+                    throw new Error(`Server Code ${response.status}: ${errText.substring(0, 100)}`);
                 }
                 
                 const data = await response.json();
                 window.appendMessage(data.reply, 'ai');
             } catch (error) {
                 console.error("Chat API Error:", error);
-                window.appendMessage("I'm having trouble connecting to my secure server. Please try again in a moment.", 'ai');
+                window.appendMessage(`Backend Error: ${error.message} (Please check Vercel Logs!)`, 'ai');
             } finally {
                 loading.classList.add('hidden');
             }
