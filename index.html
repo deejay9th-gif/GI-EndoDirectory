@@ -648,7 +648,11 @@
         function setupRealtimeListener() {
             if (!db || !isAuthReady) return;
             onSnapshot(collection(db, getPublicCollectionPath('endoscopy_procedures')), (snap) => {
-                proceduresData = snap.docs.map(d => d.data()).sort((a, b) => a.order - b.order);
+                if (!snap.empty) {
+                    proceduresData = snap.docs.map(d => d.data()).sort((a, b) => a.order - b.order);
+                } else {
+                    proceduresData = INITIAL_PROCEDURE_DATA;
+                }
                 isLoading = false;
                 permissionError = false;
                 renderApp();
@@ -661,7 +665,11 @@
                 renderApp(); 
             });
             onSnapshot(collection(db, getPublicCollectionPath('endoscopy_conditions')), (snap) => {
-                conditionsData = snap.docs.map(d => d.data());
+                if (!snap.empty) {
+                    conditionsData = snap.docs.map(d => d.data());
+                } else {
+                    conditionsData = INITIAL_CONDITIONS_DATA;
+                }
                 if (currentView === 'conditions') renderApp();
             }, (error) => { 
                 console.error("Conditions Listener Error:", error);
