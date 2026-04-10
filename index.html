@@ -391,7 +391,7 @@
             3. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
             
             try {
-                // Call the secure Vercel Serverless Function
+                // Call the secure Vercel Serverless Function instead of Google directly
                 const response = await fetch('/api/askScopy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
