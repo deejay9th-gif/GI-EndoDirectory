@@ -7,8 +7,16 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Initialize Gemini with the secret API key stored in Vercel
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // Explicit check for the API key
+    if (!apiKey) {
+      return res.status(500).json({ 
+        reply: "Backend Error: GEMINI_API_KEY is missing in Vercel Environment Variables. Please add it and REDEPLOY." 
+      });
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const { text, systemPrompt } = req.body;
 
     // Use the latest Gemini 2.5 Flash model
@@ -23,6 +31,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ reply: response.text() });
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return res.status(500).json({ reply: "I'm having trouble connecting to my brain. Please try again!" });
+    // Return the specific error message to the UI for debugging
+    return res.status(500).json({ 
+      reply: `Gemini API Error: ${error.message}. Please check your API key status and quota.` 
+    });
   }
 }
