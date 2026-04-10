@@ -253,7 +253,6 @@
             { id: 'PSC', name: 'Primary Sclerosing Cholangitis (PSC)', area: 'Advanced', description: 'Chronic liver disease causing inflammation and strictures of bile ducts.', findings: '"Beaded" appearance of the bile ducts on fluoroscopy during ERCP, with multiple strictures.', guidelines: 'ERCP for balloon dilation of dominant strictures and brushings to rule out cholangiocarcinoma. Annual colonoscopy (high association with UC).' }
         ];
         
-        // Ensure we load initial data quickly for the preview, bypassing strict Firestore rules if needed
         const INITIAL_PROCEDURE_DATA = [
              { id: 'EGD', name: 'EGD (Upper Endoscopy)', area: 'Upper GI', order: 1, accessories: [
                 { id: 'biopsy_forceps', name: 'Standard Biopsy Forceps', type: 'Diagnostic', manufacturer: 'Olympus', use: 'Collecting routine tissue samples from mucosa.', channel: '2.8mm', length: '160cm', reuse: 'Single-use' },
@@ -323,8 +322,7 @@
         proceduresData = INITIAL_PROCEDURE_DATA;
         conditionsData = INITIAL_CONDITIONS_DATA;
 
-        // --- GEMINI AI CHATBOT LOGIC ---
-        const geminiApiKey = "AIzaSyBy43Offq3564RpCjG4EtbPMOrdzErZ_qk";
+        // --- GEMINI AI CHATBOT LOGIC (VERCEL API VERSION) ---
         
         window.toggleChat = () => {
             const chatWindow = document.getElementById('chat-window');
@@ -354,32 +352,6 @@
             `;
             container.scrollTop = container.scrollHeight;
         };
-
-        async function fetchGeminiWithRetry(prompt, systemInstruction, retries = 5) {
-            const delays = [1000, 2000, 4000, 8000, 16000];
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemInstruction }] }
-            };
-
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) throw new Error(`HTTP status: ${response.status}`);
-                    const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    await new Promise(resolve => setTimeout(resolve, delays[i]));
-                }
-            }
-        }
 
         window.handleChatSubmit = async (e) => {
             e.preventDefault();
@@ -419,10 +391,22 @@
             3. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
             
             try {
-                const response = await fetchGeminiWithRetry(text, systemPrompt);
-                window.appendMessage(response, 'ai');
+                // Call the secure Vercel Serverless Function
+                const response = await fetch('/api/askScopy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, systemPrompt })
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                
+                const data = await response.json();
+                window.appendMessage(data.reply, 'ai');
             } catch (error) {
-                window.appendMessage("I'm having trouble accessing my database right now. Please try again in a moment.", 'ai');
+                console.error("Chat API Error:", error);
+                window.appendMessage("I'm having trouble connecting to my secure server. Please try again in a moment.", 'ai');
             } finally {
                 loading.classList.add('hidden');
             }
@@ -1316,7 +1300,7 @@
                     firebaseConfig = JSON.parse(__firebase_config);
                 } else {
                     firebaseConfig = {
-                        apiKey: "AIza" + "SyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0",
+                        apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
                         authDomain: "gi-endo-directory.firebaseapp.com",
                         projectId: "gi-endo-directory",
                         storageBucket: "gi-endo-directory.firebasestorage.app",
