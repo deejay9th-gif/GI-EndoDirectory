@@ -399,6 +399,9 @@
                 });
                 
                 if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error("404: The 'api' folder is missing from the root of your GitHub repository. Please ensure 'api/askScopy.js' is at the very top level of your project!");
+                    }
                     const errText = await response.text();
                     throw new Error(`Server Code ${response.status}: ${errText.substring(0, 100)}`);
                 }
@@ -407,7 +410,7 @@
                 window.appendMessage(data.reply, 'ai');
             } catch (error) {
                 console.error("Chat API Error:", error);
-                window.appendMessage(`Backend Error: ${error.message} (Please check Vercel Logs!)`, 'ai');
+                window.appendMessage(`Backend Error: ${error.message} (Please check GitHub folder structure!)`, 'ai');
             } finally {
                 loading.classList.add('hidden');
             }
