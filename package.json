@@ -1,0 +1,8 @@
+{
+  "name": "endoscopy-directory",
+  "version": "1.0.0",
+  "description": "Endoscopy app with Gemini AI",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}
