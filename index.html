@@ -259,7 +259,7 @@
                 { id: 'gold_probe', name: 'Gold Probe (Bipolar Hemostasis)', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Thermal coagulation of bleeding ulcers.', channel: '2.8mm', length: '200cm', reuse: 'Single-use' },
                 { id: 'hemoclip_applicator', name: 'Hemoclip Applicator', type: 'Therapeutic', manufacturer: 'Medtronic', use: 'Treating bleeding ulcers and perforations.', channel: '2.8mm', length: '165cm', reuse: 'Single-use' },
                 { id: 'dilation_balloon', name: 'TTS Dilation Balloon', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Treating benign strictures.', channel: '2.8mm', length: '180cm', reuse: 'Single-use' },
-                { id: 'bougie_dilator', name: 'Esophageal Bougie (Savary)', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Wire-guided dilation of splitures.', channel: 'N/A', length: 'N/A', reuse: 'Reusable' },
+                { id: 'bougie_dilator', name: 'Esophageal Bougie (Savary)', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Wire-guided dilation of strictures.', channel: 'N/A', length: 'N/A', reuse: 'Reusable' },
                 { id: 'nexpowder', name: 'Nexpowder', type: 'Therapeutic', manufacturer: 'Olympus', use: 'Hemostatic powder spray.', channel: '2.8mm', length: '220cm', reuse: 'Single-use' },
                 { id: 'variceal_banding', name: 'Variceal Banding Kit', type: 'Therapeutic', manufacturer: 'Cook Medical', use: 'Ligation of esophageal varices.', channel: '2.8mm', length: 'N/A', reuse: 'Single-use' },
                 { id: 'esophageal_stent', name: 'Esophageal Stent (SEMS)', type: 'Therapeutic', manufacturer: 'Boston Scientific', use: 'Palliative treatment for obstruction.', channel: '3.7mm', length: '200cm', reuse: 'Single-use' },
@@ -628,7 +628,6 @@
                     const ref = doc(db, getPublicCollectionPath('endoscopy_procedures'), p.id);
                     const snap = await getDoc(ref);
                     if (!snap.exists()) await setDoc(ref, p);
-                    else { await updateDoc(ref, { accessories: p.accessories }); }
                 } catch(e) { 
                     console.warn("Seeding failed (Expected if locked):", e.message);
                     break; 
@@ -1337,7 +1336,12 @@
                         try {
                              const testDoc = doc(db, getPublicCollectionPath('endoscopy_procedures'), 'EGD');
                              const snap = await getDoc(testDoc);
-                             if (!snap.exists()) await seedInitialData();
+                             const condTestDoc = doc(db, getPublicCollectionPath('endoscopy_conditions'), 'GERD');
+                             const condSnap = await getDoc(condTestDoc);
+                             
+                             if (!snap.exists() || !condSnap.exists()) {
+                                 await seedInitialData();
+                             }
                         } catch(err) {
                              console.warn("Read-only access mode enabled. Fetching data...");
                         }
