@@ -565,7 +565,7 @@
             Instructions:
             1. Answer strictly based on the provided Knowledge Base. Do not invent accessories, conditions, or treatments.
             2. When asked about conditions, you can provide their descriptions, findings, clinical guidelines, and recommended treatments.
-            3. If asked about clinical scores like GBS (Glasgow-Blatchford), Rockall, BBPS, BSG Polyp Surveillance, or Anticoagulants, briefly explain what they measure and tell the user they can calculate these in the "Tools" tab of this app.
+            3. If asked about clinical scores, classifications, or prep (GBS, Rockall, Forrest Classification, Prague Criteria, BBPS, BSG Polyp Surveillance, Anticoagulants, Fasting, Plenvu, Senna, Citramag, Enemas), briefly explain them and tell the user they can view or calculate these in the "Tools" tab of this app.
             4. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
             
             try {
@@ -1138,13 +1138,16 @@
             const tabs = [
                 { id: 'gbs', label: 'Glasgow-Blatchford' },
                 { id: 'rockall', label: 'Rockall Score' },
+                { id: 'forrest', label: 'Forrest Class.' },
+                { id: 'prague', label: 'Prague (Barrett\'s)' },
                 { id: 'bbps', label: 'Bowel Prep (BBPS)' },
+                { id: 'prep', label: 'Prep & Fasting' },
                 { id: 'bsg', label: 'Polyp Surveillance' },
                 { id: 'anticoag', label: 'Anticoagulants' }
             ];
 
             const renderTabBar = () => `
-                <div class="flex overflow-x-auto no-scrollbar space-x-2 pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
+                <div class="flex flex-wrap gap-2 pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
                     ${tabs.map(t => `
                         <button onclick="window.setTool('${t.id}')" 
                             class="px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${activeTool === t.id 
@@ -1272,6 +1275,129 @@
                                     <option value="0" ${rockallData.stigmata===0?'selected':''}>None / Clean Base (0)</option>
                                     <option value="2" ${rockallData.stigmata===2?'selected':''}>Blood, Clot, Visible Vessel, Active Bleed (2)</option>
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'forrest') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in space-y-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Forrest Classification</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Predicts risk of rebleeding in peptic ulcer disease.</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl dark:bg-rose-900/10 dark:border-rose-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-rose-700 dark:text-rose-400">Class Ia</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-rose-200 dark:border-rose-800/50 pl-2">Spurting hemorrhage</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-md">High Risk</span>
+                            </div>
+                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl dark:bg-rose-900/10 dark:border-rose-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-rose-700 dark:text-rose-400">Class Ib</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-rose-200 dark:border-rose-800/50 pl-2">Oozing hemorrhage</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-md">High Risk</span>
+                            </div>
+                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl dark:bg-rose-900/10 dark:border-rose-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-rose-700 dark:text-rose-400">Class IIa</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-rose-200 dark:border-rose-800/50 pl-2">Non-bleeding visible vessel</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-md">High Risk</span>
+                            </div>
+                            <div class="p-4 bg-amber-50 border border-amber-100 rounded-2xl dark:bg-amber-900/10 dark:border-amber-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-amber-700 dark:text-amber-400">Class IIb</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-amber-200 dark:border-amber-800/50 pl-2">Adherent clot</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-md">Moderate Risk</span>
+                            </div>
+                            <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl dark:bg-emerald-900/10 dark:border-emerald-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-emerald-700 dark:text-emerald-400">Class IIc</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-emerald-200 dark:border-emerald-800/50 pl-2">Flat pigmented spot</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md">Low Risk</span>
+                            </div>
+                            <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl dark:bg-emerald-900/10 dark:border-emerald-800/50 flex justify-between items-center">
+                                <div><span class="font-bold text-emerald-700 dark:text-emerald-400">Class III</span><span class="text-sm text-slate-700 dark:text-slate-300 ml-2 border-l border-emerald-200 dark:border-emerald-800/50 pl-2">Clean base</span></div>
+                                <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-md">Low Risk</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'prague') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Prague C & M Criteria</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-6">Used for the standardized endoscopic assessment of Barrett's Esophagus extent.</p>
+                        </div>
+                        
+                        <div class="grid gap-6 md:grid-cols-2 mb-6">
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <div class="flex items-end gap-2 mb-2">
+                                    <div class="text-4xl font-extrabold text-primary-600 dark:text-primary-400 leading-none">C</div>
+                                    <div class="text-sm font-bold text-slate-400 uppercase tracking-widest pb-1">Value</div>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">Circumferential Extent</h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Distance (in cm) from the gastroesophageal junction (GEJ) to the most proximal margin of continuous, circumferential columnar mucosa.</p>
+                            </div>
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <div class="flex items-end gap-2 mb-2">
+                                    <div class="text-4xl font-extrabold text-primary-600 dark:text-primary-400 leading-none">M</div>
+                                    <div class="text-sm font-bold text-slate-400 uppercase tracking-widest pb-1">Value</div>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">Maximum Extent</h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">Distance (in cm) from the GEJ to the most proximal margin of any columnar mucosa (including any tongues or islands).</p>
+                            </div>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/10 p-5 rounded-2xl text-xs text-primary-800 dark:text-primary-200 border border-primary-100 dark:border-primary-800/50 leading-relaxed">
+                            <strong class="text-sm">Key Landmarks:</strong><br>
+                            <span class="inline-block mt-2">• <strong>GEJ:</strong> Proximal margin of the gastric mucosal folds.</span><br>
+                            <span class="inline-block mt-1">• <strong>SCJ (Z-line):</strong> Squamocolumnar junction.</span><br>
+                            <em class="inline-block mt-3 opacity-80">Note: The Prague criteria require Barrett's to be ≥ 1 cm to be formally diagnosed. Isolated islands above the M extent are recorded separately.</em>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'prep') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in space-y-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Bowel Prep & Fasting Guidelines</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Standard protocols for patient preparation and fasting.</p>
+                        </div>
+                        
+                        <!-- Fasting -->
+                        <div class="p-5 border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-800/50 rounded-2xl relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 text-amber-500/20 dark:text-amber-500/10 w-24 h-24">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-full h-full"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <h4 class="font-bold text-sm text-amber-800 dark:text-amber-400 mb-3 relative z-10 uppercase tracking-wider">Fasting Rules (All Procedures)</h4>
+                            <ul class="text-sm text-amber-900 dark:text-amber-300 space-y-2 ml-5 list-disc relative z-10 font-medium">
+                                <li><strong>Clear Fluids:</strong> Allowed up to <strong class="underline decoration-amber-400/50">2 hours</strong> before the procedure time.</li>
+                                <li><strong>Solid Food (Gastroscopy/EUS):</strong> Must stop <strong class="underline decoration-amber-400/50">6 hours</strong> before.</li>
+                                <li><strong>Solid Food (Colonoscopy):</strong> Must stop when bowel prep regimen begins.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Preps -->
+                        <div class="space-y-4">
+                            <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <h4 class="font-bold text-sm text-primary-600 dark:text-primary-400 mb-1">Plenvu (Standard Split-Dose)</h4>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">1L Low-Volume PEG Bowel Prep</p>
+                                <ul class="text-xs text-slate-700 dark:text-slate-300 space-y-2 list-disc ml-4 leading-relaxed">
+                                    <li><strong>Dose 1 (Mango flavor):</strong> Take at 6:00 PM the evening before the procedure. Mix with 500ml water over 30 mins, followed by 500ml clear fluid.</li>
+                                    <li><strong>Dose 2 (Fruit punch flavor, 2 sachets A+B):</strong> Take early morning on the day of the procedure (approx 4-5 hours prior). Mix with 500ml water over 30 mins, followed by 500ml clear fluid.</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <h4 class="font-bold text-sm text-primary-600 dark:text-primary-400 mb-1">Senna Tablets + Citramag</h4>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Alternative / Comorbidity Prep</p>
+                                <ul class="text-xs text-slate-700 dark:text-slate-300 space-y-2 list-disc ml-4 leading-relaxed">
+                                    <li><strong>Day before (2:00 PM):</strong> Take 10 Senna tablets with water.</li>
+                                    <li><strong>Day before (4:00 PM):</strong> Dissolve 1 sachet of Citramag in 200ml hot water, cool, and drink. Follow with at least 1L clear fluids.</li>
+                                    <li><strong>Day before (6:00 PM) or Morning of:</strong> Take second sachet of Citramag depending on whether the procedure is on a morning vs. afternoon list.</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <h4 class="font-bold text-sm text-primary-600 dark:text-primary-400 mb-1">Phosphate Enema</h4>
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Distal Clearance / Flexi Sig</p>
+                                <ul class="text-xs text-slate-700 dark:text-slate-300 space-y-2 list-disc ml-4 leading-relaxed">
+                                    <li>Typically administered <strong>1 to 2 hours prior</strong> to the procedure.</li>
+                                    <li>Administered on the ward or in the endoscopy unit by a nurse.</li>
+                                    <li>Retain enema for at least 5-10 minutes if possible before opening bowels.</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
