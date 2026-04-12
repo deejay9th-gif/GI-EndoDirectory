@@ -158,7 +158,7 @@
                 <div class="flex gap-2 w-full">
                     <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 flex items-center justify-center flex-shrink-0 text-sm shadow-sm ring-1 ring-primary-500/20">🤖</div>
                     <div class="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3.5 rounded-2xl rounded-tl-none text-sm text-slate-700 dark:text-slate-200 shadow-sm leading-relaxed">
-                        Hello! I'm Scopy. You can ask me to find accessories, explain clinical scores, or review prep guidelines based on this directory!
+                        Hello! I'm Scopy. You can ask me to find accessories, explain clinical scores, or review prep guidelines and treatments based on this directory!
                     </div>
                 </div>
             </div>
@@ -229,28 +229,204 @@
         const PROCEDURE_AREAS = ['All', 'Upper GI', 'Lower GI', 'Advanced', 'Other'];
 
         const INITIAL_CONDITIONS_DATA = [
-            { id: 'GERD', name: 'Gastroesophageal Reflux Disease (GERD)', area: 'Upper GI', description: 'Chronic condition where stomach acid flows back into the esophagus.', findings: 'Erosive esophagitis, strictures, Barrett\'s esophagus.', guidelines: 'PPI therapy; surveillance if Barrett\'s is present.' },
-            { id: 'BARRETTS', name: 'Barrett\'s Esophagus', area: 'Upper GI', description: 'Intestinal metaplasia of the distal esophagus mucosa.', findings: 'Salmon-colored mucosa extending above the gastroesophageal junction.', guidelines: 'Prague classification (C & M criteria). Surveillance intervals depend on dysplasia grade.' },
-            { id: 'CROHNS', name: 'Crohn\'s Disease', area: 'Lower GI', description: 'Inflammatory bowel disease affecting any part of the GI tract.', findings: 'Skip lesions, cobblestone appearance, deep ulcerations, strictures.', guidelines: 'Treat to target (mucosal healing). Biologics/immunomodulators.' },
-            { id: 'UC', name: 'Ulcerative Colitis', area: 'Lower GI', description: 'Inflammatory bowel disease causing continuous mucosal inflammation of the colon.', findings: 'Continuous erythema, loss of vascular pattern, friability, pseudopolyps.', guidelines: 'Mayo Endoscopic Score. Surveillance for dysplasia after 8-10 years of disease.' },
-            { id: 'PUD', name: 'Peptic Ulcer Disease', area: 'Upper GI', description: 'Defect in the gastric or duodenal mucosa.', findings: 'Ulcer crater, usually with a clean base or signs of recent bleeding (Forrest classification).', guidelines: 'H. pylori testing. PPI therapy. Repeat EGD for gastric ulcers to rule out malignancy.' },
-            { id: 'GALLSTONES', name: 'Gallstones (Choledocholithiasis)', area: 'Advanced', description: 'Hardened deposits of digestive fluid in the gallbladder that migrate to the bile ducts.', findings: 'Stones visualized in the common bile duct (CBD) during ERCP or EUS; dilated bile ducts.', guidelines: 'ERCP with sphincterotomy and stone extraction. Laparoscopic cholecystectomy for definitive management.' },
-            { id: 'HPYLORI', name: 'Helicobacter Pylori (H. pylori)', area: 'Upper GI', description: 'Bacterial infection of the stomach mucosa that can cause ulcers and increase gastric cancer risk.', findings: 'Gastric erythema, erosions, or nodularity. Often normal appearance. Diagnosed via CLO test (Rapid Urease Test) from biopsies.', guidelines: 'Eradication therapy (PPI + antibiotics). Retesting to confirm eradication.' },
-            { id: 'HAEMORRHOIDS', name: 'Haemorrhoids', area: 'Lower GI', description: 'Swollen and inflamed veins in the rectum and anus that cause discomfort and bleeding.', findings: 'Internal or external enlarged vascular cushions. May show signs of recent bleeding.', guidelines: 'Conservative management. Endoscopic banding (hemorrhoidal band ligation) for symptomatic internal hemorrhoids.' },
-            { id: 'COELIAC', name: 'Coeliac Disease', area: 'Upper GI', description: 'Autoimmune reaction to eating gluten, leading to small intestine damage.', findings: 'Loss of duodenal folds, scalloping, nodularity, or mucosal fissuring in the duodenum.', guidelines: 'Requires 4-6 biopsies from D2 and 1-2 from the duodenal bulb while on a gluten-containing diet.' },
-            { id: 'VARICEAL_BLEED', name: 'Esophageal Variceal Bleed', area: 'Upper GI', description: 'EMERGENCY: Life-threatening bleeding from enlarged veins in the esophagus, typically from portal hypertension.', findings: 'Actively spurting varices, "white nipple" sign, or red wale marks on engorged esophageal veins.', guidelines: 'Resuscitation. Urgent EGD within 12 hours for variceal band ligation (VBL) or cyanoacrylate glue.' },
-            { id: 'FBO', name: 'Food Bolus Obstruction', area: 'Upper GI', description: 'EMERGENCY: Impaction of food (usually meat) in the esophagus causing complete blockage.', findings: 'Impacted food material in the esophagus. Underlying eosinophilic esophagitis (EoE), Schatzki ring, or stricture often present.', guidelines: 'Urgent EGD for removal/pushing. Push technique or retrieval using net/snare. Biopsy for EoE after clearance.' },
-            { id: 'EOE', name: 'Eosinophilic Esophagitis (EoE)', area: 'Upper GI', description: 'An allergic inflammatory condition of the esophagus.', findings: 'Trachealization (rings), linear furrows, white exudates (eosinophil microabscesses), strictures.', guidelines: 'Biopsies (proximal and distal). Treatment with PPIs, topical steroids, or elimination diet.' },
-            { id: 'MALLORY_WEISS', name: 'Mallory-Weiss Tear', area: 'Upper GI', description: 'A mucosal tear at the gastroesophageal junction, usually from severe vomiting or coughing.', findings: 'Longitudinal tear in the mucosa at the GE junction, which may be actively bleeding or have a clot.', guidelines: 'Most heal spontaneously. Endoscopic therapy (clips, epinephrine, or thermal therapy) if actively bleeding.' },
-            { id: 'GAVE', name: 'Gastric Antral Vascular Ectasia (GAVE)', area: 'Upper GI', description: 'Also known as watermelon stomach, causing chronic upper GI bleeding and anemia.', findings: 'Linear erythematous streaks radiating from the pylorus in the antrum.', guidelines: 'Endoscopic therapy with Argon Plasma Coagulation (APC) is the mainstay of treatment.' },
-            { id: 'ACHALASIA', name: 'Achalasia', area: 'Upper GI', description: 'A motility disorder where the esophagus fails to relax and push food down.', findings: 'Dilated esophagus containing retained food/fluid, and a tight lower esophageal sphincter that "pops" open with gentle scope pressure.', guidelines: 'Botox injection, pneumatic dilation, or referral for POEM/Heller myotomy.' },
-            { id: 'POLYPS', name: 'Colorectal Polyps / Adenomas', area: 'Lower GI', description: 'Growths on the inner lining of the colon, critical for colon cancer prevention.', findings: 'Sessile, pedunculated, or flat lesions. Paris classification often used.', guidelines: 'Polypectomy via cold/hot snare depending on size. Follow BSG/ESGE guidelines for surveillance.' },
-            { id: 'DIVERTICULAR', name: 'Diverticular Disease & Bleeding', area: 'Lower GI', description: 'Outpouchings in the colon wall; can cause severe acute lower GI bleeding.', findings: 'Multiple mucosal pockets (diverticula). In bleeding, may see active spurting or an adherent clot in a diverticulum.', guidelines: 'For active bleeding, endoscopic clipping or epinephrine injection. Often resolves spontaneously.' },
-            { id: 'RAD_PROCTITIS', name: 'Radiation Proctitis', area: 'Lower GI', description: 'Damage to the lower bowel after pelvic radiation therapy, leading to bleeding.', findings: 'Pale, friable mucosa with multiple telangiectasias (spider veins) in the rectum.', guidelines: 'Argon Plasma Coagulation (APC) is the standard endoscopic treatment for bleeding.' },
-            { id: 'MICROSCOPIC_COLITIS', name: 'Microscopic Colitis', area: 'Lower GI', description: 'Inflammation of the colon causing chronic watery diarrhea.', findings: 'Endoscopically NORMAL mucosa.', guidelines: 'Requires random biopsies throughout the colon to diagnose (lymphocytic or collagenous subtypes).' },
-            { id: 'CHOLANGIOCARCINOMA', name: 'Cholangiocarcinoma', area: 'Advanced', description: 'Cancer of the bile ducts.', findings: 'Biliary strictures seen on ERCP or mass lesions on EUS.', guidelines: 'ERCP for brush cytology/biopsy and placement of plastic or metal stents to relieve jaundice.' },
-            { id: 'PSEUDOCYST', name: 'Pancreatic Pseudocyst', area: 'Advanced', description: 'Fluid collection that forms after acute or chronic pancreatitis.', findings: 'Extrinsic compression on EGD; EUS shows a distinct fluid-filled cavity adjacent to the stomach/duodenum.', guidelines: 'EUS-guided transluminal drainage using double pigtail plastic stents or Lumen-Apposing Metal Stents (LAMS).' },
-            { id: 'PSC', name: 'Primary Sclerosing Cholangitis (PSC)', area: 'Advanced', description: 'Chronic liver disease causing inflammation and strictures of bile ducts.', findings: '"Beaded" appearance of the bile ducts on fluoroscopy during ERCP, with multiple strictures.', guidelines: 'ERCP for balloon dilation of dominant strictures and brushings to rule out cholangiocarcinoma. Annual colonoscopy (high association with UC).' }
+            { 
+                id: 'GERD', 
+                name: 'Gastroesophageal Reflux Disease (GERD)', 
+                area: 'Upper GI', 
+                description: 'Chronic condition where stomach acid flows back into the esophagus.', 
+                findings: 'Erosive esophagitis, strictures, Barrett\'s esophagus.', 
+                guidelines: 'PPI therapy; surveillance if Barrett\'s is present.',
+                treatments: 'Standard-dose PPIs, H2-receptor antagonists, and lifestyle modifications (weight loss, elevating head of bed). Refractory cases may require anti-reflux surgery (Fundoplication) or endoscopic options (TIF, Stretta).'
+            },
+            { 
+                id: 'BARRETTS', 
+                name: 'Barrett\'s Esophagus', 
+                area: 'Upper GI', 
+                description: 'Intestinal metaplasia of the distal esophagus mucosa.', 
+                findings: 'Salmon-colored mucosa extending above the gastroesophageal junction.', 
+                guidelines: 'Prague classification (C & M criteria). Surveillance intervals depend on dysplasia grade.',
+                treatments: 'High-dose PPI therapy. For high-grade dysplasia or early mucosal cancer: Endoscopic Eradication Therapy (EET) via Endoscopic Mucosal Resection (EMR) followed by Radiofrequency Ablation (RFA).'
+            },
+            { 
+                id: 'CROHNS', 
+                name: 'Crohn\'s Disease', 
+                area: 'Lower GI', 
+                description: 'Inflammatory bowel disease affecting any part of the GI tract.', 
+                findings: 'Skip lesions, cobblestone appearance, deep ulcerations, strictures.', 
+                guidelines: 'BSG 2025: Treat to target (endoscopic/mucosal healing). Risk assess for surgery and colorectal cancer surveillance.',
+                treatments: 'Corticosteroids for acute flares. Maintenance via immunomodulators (thiopurines, methotrexate) or advanced therapies (Anti-TNF, ustekinumab, vedolizumab, JAK inhibitors). Surgery for strictures/fistulas. Nutritional optimization.'
+            },
+            { 
+                id: 'UC', 
+                name: 'Ulcerative Colitis', 
+                area: 'Lower GI', 
+                description: 'Inflammatory bowel disease causing continuous mucosal inflammation of the colon.', 
+                findings: 'Continuous erythema, loss of vascular pattern, friability, pseudopolyps.', 
+                guidelines: 'BSG 2025: Treat to target (Mayo Endoscopic Score 0-1). Personalised surveillance for dysplasia every 1-3 years using chromoendoscopy.',
+                treatments: 'Mild/Mod: Oral/topical 5-ASA (mesalazine). Severe flares: IV corticosteroids, rescue with infliximab or ciclosporin. Maintenance: Advanced therapies (Anti-TNF, vedolizumab, JAK inhibitors, S1P modulators). Colectomy if refractory.'
+            },
+            { 
+                id: 'PUD', 
+                name: 'Peptic Ulcer Disease', 
+                area: 'Upper GI', 
+                description: 'Defect in the gastric or duodenal mucosa.', 
+                findings: 'Ulcer crater, usually with a clean base or signs of recent bleeding (Forrest classification).', 
+                guidelines: 'H. pylori testing. Repeat EGD for gastric ulcers in 6-8 weeks to rule out malignancy.',
+                treatments: 'High-dose IV PPI for bleeding ulcers. Endoscopic hemostasis (TTS clips, thermal coagulation, epinephrine injection) for active bleeding/visible vessels. Eradicate H. pylori if positive.'
+            },
+            { 
+                id: 'GALLSTONES', 
+                name: 'Gallstones (Choledocholithiasis)', 
+                area: 'Advanced', 
+                description: 'Hardened deposits of digestive fluid in the gallbladder that migrate to the bile ducts.', 
+                findings: 'Stones visualized in the common bile duct (CBD) during ERCP or EUS; dilated bile ducts.', 
+                guidelines: 'BSG ERCP guidelines recommend early clearance of CBD stones in acute biliary pancreatitis or cholangitis.',
+                treatments: 'Therapeutic ERCP with biliary sphincterotomy and balloon/basket stone extraction. Followed by laparoscopic cholecystectomy to prevent recurrence.'
+            },
+            { 
+                id: 'HPYLORI', 
+                name: 'Helicobacter Pylori (H. pylori)', 
+                area: 'Upper GI', 
+                description: 'Bacterial infection of the stomach mucosa that can cause ulcers and increase gastric cancer risk.', 
+                findings: 'Gastric erythema, erosions, or nodularity. Often normal appearance. Diagnosed via CLO test.', 
+                guidelines: 'Test and treat strategy. Retesting to confirm eradication (via urea breath test or stool antigen) is mandatory.',
+                treatments: 'Standard triple therapy (PPI + amoxicillin + clarithromycin/metronidazole) or bismuth quadruple therapy for 7-14 days.'
+            },
+            { 
+                id: 'HAEMORRHOIDS', 
+                name: 'Haemorrhoids', 
+                area: 'Lower GI', 
+                description: 'Swollen and inflamed veins in the rectum and anus that cause discomfort and bleeding.', 
+                findings: 'Internal or external enlarged vascular cushions. May show signs of recent bleeding.', 
+                guidelines: 'Exclude higher GI pathology (via flexible sigmoidoscopy/colonoscopy) if red flag symptoms exist.',
+                treatments: 'Conservative (fluids, fiber, laxatives). Grade 1-3 internal: Endoscopic/proctoscopic rubber band ligation. Grade 4 or refractory: Surgical hemorrhoidectomy.'
+            },
+            { 
+                id: 'COELIAC', 
+                name: 'Coeliac Disease', 
+                area: 'Upper GI', 
+                description: 'Autoimmune reaction to eating gluten, leading to small intestine damage.', 
+                findings: 'Loss of duodenal folds, scalloping, nodularity, or mucosal fissuring in the duodenum.', 
+                guidelines: 'Requires 4-6 biopsies from D2 and 1-2 from the duodenal bulb while on a gluten-containing diet.',
+                treatments: 'Strict, lifelong gluten-free diet. Dietetic input. Monitor for osteoporosis, hyposplenism, and nutritional deficiencies (iron, B12, folate, vitamin D).'
+            },
+            { 
+                id: 'VARICEAL_BLEED', 
+                name: 'Esophageal Variceal Bleed', 
+                area: 'Upper GI', 
+                description: 'EMERGENCY: Life-threatening bleeding from enlarged veins in the esophagus, typically from portal hypertension.', 
+                findings: 'Actively spurting varices, "white nipple" sign, or red wale marks on engorged esophageal veins.', 
+                guidelines: 'BSG 2015/Updates: Resuscitation. Urgent EGD within 12 hours.',
+                treatments: 'Vasoactive drugs (terlipressin) and prophylactic antibiotics (ceftriaxone) immediately. Endoscopic Variceal Band Ligation (VBL). TIPS procedure if endoscopic therapy fails.'
+            },
+            { 
+                id: 'FBO', 
+                name: 'Food Bolus Obstruction', 
+                area: 'Upper GI', 
+                description: 'EMERGENCY: Impaction of food (usually meat) in the esophagus causing complete blockage.', 
+                findings: 'Impacted food material in the esophagus. Underlying EoE, Schatzki ring, or stricture often present.', 
+                guidelines: 'Urgent EGD for removal/pushing. Push technique or retrieval using net/snare. Biopsy for EoE after clearance.',
+                treatments: 'Endoscopic removal (Roth net, grasper) or gentle push into the stomach. Glucagon/Buscopan may be tried pre-endoscopy. Treat underlying stricture/EoE post-clearance.'
+            },
+            { 
+                id: 'EOE', 
+                name: 'Eosinophilic Esophagitis (EoE)', 
+                area: 'Upper GI', 
+                description: 'An allergic inflammatory condition of the esophagus.', 
+                findings: 'Trachealization (rings), linear furrows, white exudates (eosinophil microabscesses), strictures.', 
+                guidelines: 'Biopsies (minimum 6 from proximal and distal). >15 eosinophils/HPF confirms diagnosis.',
+                treatments: 'High-dose PPI therapy. Topical swallowed corticosteroids (budesonide or fluticasone). Six-food elimination diet. Endoscopic balloon dilation for symptomatic strictures.'
+            },
+            { 
+                id: 'MALLORY_WEISS', 
+                name: 'Mallory-Weiss Tear', 
+                area: 'Upper GI', 
+                description: 'A mucosal tear at the gastroesophageal junction, usually from severe vomiting or coughing.', 
+                findings: 'Longitudinal tear in the mucosa at the GE junction, which may be actively bleeding or have a clot.', 
+                guidelines: 'Most heal spontaneously. Assess for active bleeding vs. clean base.',
+                treatments: 'Supportive care if not bleeding. If active bleeding: Endoscopic therapy using hemoclips, epinephrine injection, or multipolar electrocoagulation.'
+            },
+            { 
+                id: 'GAVE', 
+                name: 'Gastric Antral Vascular Ectasia (GAVE)', 
+                area: 'Upper GI', 
+                description: 'Also known as watermelon stomach, causing chronic upper GI bleeding and anemia.', 
+                findings: 'Linear erythematous streaks radiating from the pylorus in the antrum.', 
+                guidelines: 'Rule out portal hypertensive gastropathy, as treatments differ.',
+                treatments: 'Argon Plasma Coagulation (APC) is the standard endoscopic therapy. Refractory cases may require Radiofrequency Ablation (RFA) or endoscopic band ligation.'
+            },
+            { 
+                id: 'ACHALASIA', 
+                name: 'Achalasia', 
+                area: 'Upper GI', 
+                description: 'A motility disorder where the esophagus fails to relax and push food down.', 
+                findings: 'Dilated esophagus containing retained food/fluid, tight LES that "pops" open with gentle scope pressure.', 
+                guidelines: 'High-resolution manometry is required to confirm subtype prior to definitive treatment.',
+                treatments: 'Peroral Endoscopic Myotomy (POEM), Laparoscopic Heller Myotomy (LHM), or pneumatic balloon dilation. Botulinum toxin injection for patients unfit for invasive procedures.'
+            },
+            { 
+                id: 'POLYPS', 
+                name: 'Colorectal Polyps / Adenomas', 
+                area: 'Lower GI', 
+                description: 'Growths on the inner lining of the colon, critical for colon cancer prevention.', 
+                findings: 'Sessile, pedunculated, or flat lesions. Paris classification used for morphology.', 
+                guidelines: 'Follow BSG guidelines for surveillance based on size, number, and pathology (High Risk vs Low Risk).',
+                treatments: 'Cold snare polypectomy for diminutive/small polyps (<10mm). Endoscopic Mucosal Resection (EMR) or Endoscopic Submucosal Dissection (ESD) for larger or complex lesions.'
+            },
+            { 
+                id: 'DIVERTICULAR', 
+                name: 'Diverticular Disease & Bleeding', 
+                area: 'Lower GI', 
+                description: 'Outpouchings in the colon wall; can cause severe acute lower GI bleeding.', 
+                findings: 'Multiple mucosal pockets (diverticula). In bleeding, may see active spurting or an adherent clot.', 
+                guidelines: 'For active bleeding, confirm location. Often resolves spontaneously.',
+                treatments: 'If active bleeding source is identified endoscopically: TTS clips, epinephrine, or banding. Angiographic embolization or surgical resection if bleeding is massive/uncontrolled.'
+            },
+            { 
+                id: 'RAD_PROCTITIS', 
+                name: 'Radiation Proctitis', 
+                area: 'Lower GI', 
+                description: 'Damage to the lower bowel after pelvic radiation therapy, leading to bleeding.', 
+                findings: 'Pale, friable mucosa with multiple telangiectasias (spider veins) in the rectum.', 
+                guidelines: 'Exclude recurrent pelvic malignancy or other causes of proctitis via biopsy.',
+                treatments: 'Sucralfate enemas for mild symptoms. Endoscopic Argon Plasma Coagulation (APC) or Radiofrequency Ablation (RFA) for recurrent bleeding.'
+            },
+            { 
+                id: 'MICROSCOPIC_COLITIS', 
+                name: 'Microscopic Colitis', 
+                area: 'Lower GI', 
+                description: 'Inflammation of the colon causing chronic watery diarrhea.', 
+                findings: 'Endoscopically NORMAL mucosa.', 
+                guidelines: 'Requires random biopsies throughout the colon to diagnose (lymphocytic or collagenous subtypes).',
+                treatments: 'Avoid NSAIDs/PPIs if implicated. Loperamide for symptoms. Oral budesonide (9mg taper) is first-line induction therapy. Cholestyramine if bile acid malabsorption coexists.'
+            },
+            { 
+                id: 'CHOLANGIOCARCINOMA', 
+                name: 'Cholangiocarcinoma', 
+                area: 'Advanced', 
+                description: 'Cancer of the bile ducts.', 
+                findings: 'Biliary strictures seen on ERCP or mass lesions on EUS.', 
+                guidelines: 'ERCP for brush cytology/biopsy to confirm diagnosis and stage.',
+                treatments: 'Surgical resection if localized. Endoscopic placement of plastic or Self-Expanding Metal Stents (SEMS) to relieve jaundice/palliate. Systemic chemotherapy.'
+            },
+            { 
+                id: 'PSEUDOCYST', 
+                name: 'Pancreatic Pseudocyst', 
+                area: 'Advanced', 
+                description: 'Fluid collection that forms after acute or chronic pancreatitis.', 
+                findings: 'Extrinsic compression on EGD; EUS shows a distinct fluid-filled cavity adjacent to stomach/duodenum.', 
+                guidelines: 'Intervene only if symptomatic, enlarging, or infected. Wait at least 4 weeks for wall maturation.',
+                treatments: 'EUS-guided transluminal drainage (cystogastrostomy) using Lumen-Apposing Metal Stents (LAMS) or double-pigtail plastic stents.'
+            },
+            { 
+                id: 'PSC', 
+                name: 'Primary Sclerosing Cholangitis (PSC)', 
+                area: 'Advanced', 
+                description: 'Chronic liver disease causing inflammation and strictures of bile ducts.', 
+                findings: '"Beaded" appearance of the bile ducts on fluoroscopy during ERCP, with multiple strictures.', 
+                guidelines: 'Annual colonoscopy (high association with UC). ERCP with brushings of dominant strictures to rule out cholangiocarcinoma.',
+                treatments: 'Endoscopic balloon dilation of symptomatic dominant strictures. Ursodeoxycholic acid (UDCA) in selected cohorts. Liver transplantation for end-stage liver disease.'
+            }
         ];
 
         const INITIAL_PROCEDURE_DATA = [
@@ -377,7 +553,8 @@
                 Category: c.area,
                 Details: c.description,
                 Findings: c.findings,
-                Guidelines: c.guidelines
+                Guidelines: c.guidelines,
+                Treatments: c.treatments // <-- Now feeding treatments to the AI
             })));
 
             const systemPrompt = `You are Scopy. You are integrated directly into the Endoscopy Directory app.
@@ -386,9 +563,10 @@
             Conditions: ${currentCondData}
 
             Instructions:
-            1. Answer strictly based on the provided Knowledge Base. Do not invent accessories or conditions.
-            2. If asked about clinical scores like GBS (Glasgow-Blatchford), Rockall, BBPS, BSG Polyp Surveillance, or Anticoagulants, briefly explain what they measure and tell the user they can calculate these in the "Tools" tab of this app.
-            3. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
+            1. Answer strictly based on the provided Knowledge Base. Do not invent accessories, conditions, or treatments.
+            2. When asked about conditions, you can provide their descriptions, findings, clinical guidelines, and recommended treatments.
+            3. If asked about clinical scores like GBS (Glasgow-Blatchford), Rockall, BBPS, BSG Polyp Surveillance, or Anticoagulants, briefly explain what they measure and tell the user they can calculate these in the "Tools" tab of this app.
+            4. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
             
             try {
                 // Call the secure Vercel Serverless Function instead of Google directly
@@ -944,6 +1122,10 @@
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Clinical Guidelines</h4>
                                     <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.guidelines}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Recommended Treatments</h4>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.treatments}</p>
                                 </div>
                             </div>
                         </div>` : ''}
