@@ -505,7 +505,6 @@
             chatWindow.classList.toggle('hidden');
             chatWindow.classList.toggle('flex');
             
-            // Auto focus input when opened
             if(!chatWindow.classList.contains('hidden')) {
                 setTimeout(() => document.getElementById('chat-input').focus(), 100);
             }
@@ -514,8 +513,6 @@
         window.appendMessage = (text, sender) => {
             const container = document.getElementById('chat-messages');
             const isUser = sender === 'user';
-            
-            // Format basic bold markdown (**text** to <strong>text</strong>)
             const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>');
 
             container.innerHTML += `
@@ -541,7 +538,6 @@
             const loading = document.getElementById('chat-loading');
             loading.classList.remove('hidden');
 
-            // Build Knowledge Base context from current app data
             const currentData = JSON.stringify(proceduresData.map(p => ({
                 Procedure: p.name,
                 Category: p.area,
@@ -554,7 +550,7 @@
                 Details: c.description,
                 Findings: c.findings,
                 Guidelines: c.guidelines,
-                Treatments: c.treatments // <-- Now feeding treatments to the AI
+                Treatments: c.treatments
             })));
 
             const systemPrompt = `You are Scopy. You are integrated directly into the Endoscopy Directory app.
@@ -565,11 +561,10 @@
             Instructions:
             1. Answer strictly based on the provided Knowledge Base. Do not invent accessories, conditions, or treatments.
             2. When asked about conditions, you can provide their descriptions, findings, clinical guidelines, and recommended treatments.
-            3. If asked about clinical scores, classifications, or prep (GBS, Rockall, Forrest Classification, Prague Criteria, BBPS, BSG Polyp Surveillance, Anticoagulants, Fasting, Plenvu, Senna, Citramag, Enemas), briefly explain them and tell the user they can view or calculate these in the "Tools" tab of this app.
+            3. If asked about clinical scores, classifications, prep, or emergencies (GBS, Rockall, Forrest, Prague, BBPS, BSG, Paris Classification, Biopsy Protocols, Anticoagulants, Fasting, Prep, Variceal Bleeds, Foreign Bodies, Perforations, Sedation, Midazolam, Fentanyl, Reversals, Antispasmodics), briefly explain them and tell the user they can view detailed guides and calculators in the "Tools" tab of this app.
             4. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
             
             try {
-                // Call the secure Vercel Serverless Function instead of Google directly
                 const response = await fetch('/api/askScopy', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -578,7 +573,7 @@
                 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error("404: The 'api' folder is missing from the root of your GitHub repository. Please ensure 'api/askScopy.js' is at the very top level of your project!");
+                        throw new Error("404: The 'api' folder is missing from the root of your GitHub repository.");
                     }
                     const errText = await response.text();
                     throw new Error(`Server Code ${response.status}: ${errText.substring(0, 100)}`);
@@ -586,14 +581,14 @@
                 
                 const data = await response.json();
                 window.appendMessage(data.reply, 'ai');
+
             } catch (error) {
                 console.error("Chat API Error:", error);
-                window.appendMessage(`Backend Error: ${error.message} (Please check GitHub folder structure!)`, 'ai');
+                window.appendMessage(`Backend Error: ${error.message}`, 'ai');
             } finally {
                 loading.classList.add('hidden');
             }
         };
-
 
         // --- UI ICONS ---
         const SearchIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
@@ -602,7 +597,6 @@
         const YoutubeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M2.8 14.5c-.83-1.3-.83-3.4 0-4.7C4.6 6.1 9.3 4 12 4s7.4 2.1 9.2 5.8c.83 1.3.83 3.4 0 4.7-1.8 3.7-6.5 5.8-9.2 5.8S4.6 18.2 2.8 14.5z"/><path d="m10 16 5-4-5-4z"/></svg>`;
         const FileTextIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>`;
         const PlusIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
-        const LoaderIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 mr-2 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
         const ChevronDownIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="m6 9 6 6 6-6"/></svg>`;
         const MoonIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
         const SunIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
@@ -610,13 +604,11 @@
         const CalculatorIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>`;
         const BookIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`;
         const HeartPulseIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v10"/><path d="M9 10h6"/></svg>`;
+        const AnatomyIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 4a2 2 0 0 0-2 2v1c0 1.1.9 2 2 2s2-.9 2-2V6a2 2 0 0 0-2-2Z"/><path d="M12 11c-2.8 0-5 2.2-5 5v5h10v-5c0-2.8-2.2-5-5-5Z"/></svg>`;
+        const MicroIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M17 3h-2v4h2V3Z"/><path d="M15 7v10"/><path d="M15 17c0 1.7-1.3 3-3 3s-3-1.3-3-3v-6"/><path d="M9 11H7a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><path d="M11 21v-4"/><path d="M21 21H3"/></svg>`;
 
         // Environment Detection and Path Formatting
         const getPublicCollectionPath = (collectionName) => {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : null;
-            if (appId) {
-                return `artifacts/${appId}/public/data/${collectionName}`;
-            }
             return collectionName;
         };
 
@@ -677,7 +669,14 @@
             else renderApp();
         };
 
-        window.setView = (view) => { currentView = view; renderApp(); };
+        window.setView = (view) => { 
+            if (currentView !== view) {
+                searchTerm = '';
+                selectedAreaFilter = 'All';
+                currentView = view; 
+            }
+            renderApp(); 
+        };
         window.setTool = (tool) => { activeTool = tool; renderApp(); };
         
         window.setSearch = (val) => { 
@@ -699,6 +698,21 @@
             } else {
                 renderApp();
             }
+        };
+
+        window.navigateFromAnatomy = (area, term) => {
+            selectedAreaFilter = area;
+            searchTerm = term || '';
+            currentView = 'directory';
+            renderApp();
+            setTimeout(() => {
+                const input = document.getElementById('search-input');
+                if(input) { input.value = searchTerm; }
+                if(searchTerm) {
+                    const clearBtn = document.getElementById('search-clear-btn');
+                    if(clearBtn) clearBtn.classList.remove('hidden', 'opacity-0');
+                }
+            }, 50);
         };
 
         window.toggleFavoritesFilter = () => { showFavoritesOnly = !showFavoritesOnly; renderApp(); };
@@ -1086,7 +1100,11 @@
 
             let filtered = conditionsData.filter(c => selectedAreaFilter === 'All' || c.area === selectedAreaFilter || (selectedAreaFilter === 'Other' && !['Upper GI', 'Lower GI', 'Advanced'].includes(c.area)));
             const term = searchTerm.toLowerCase();
-            if (term) filtered = filtered.filter(c => c.name.toLowerCase().includes(term) || c.description.toLowerCase().includes(term) || c.findings.toLowerCase().includes(term));
+            if (term) filtered = filtered.filter(c => 
+                (c.name && c.name.toLowerCase().includes(term)) || 
+                (c.description && c.description.toLowerCase().includes(term)) || 
+                (c.findings && c.findings.toLowerCase().includes(term))
+            );
 
             if (filtered.length === 0) return `<div class="text-center py-32 px-6 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600"><div class="text-4xl mb-4 opacity-50">🔍</div><div class="font-medium">No conditions found matching your criteria.</div></div>`;
 
@@ -1100,8 +1118,8 @@
                             <div class="flex items-center">
                                 <div class="p-3 rounded-xl mr-4 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 shadow-sm ring-1 ring-rose-100 dark:ring-rose-800/50">${HeartPulseIcon}</div>
                                 <div>
-                                    <h2 class="text-base font-bold text-slate-800 dark:text-slate-200 tracking-tight">${c.name}</h2>
-                                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">${c.area}</span>
+                                    <h2 class="text-base font-bold text-slate-800 dark:text-slate-200 tracking-tight">${c.name || 'Unknown Condition'}</h2>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">${c.area || 'Other'}</span>
                                 </div>
                             </div>
                             <div class="flex items-center space-x-3">
@@ -1113,24 +1131,68 @@
                             <div class="space-y-4">
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Description</h4>
-                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.description}</p>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.description || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Endoscopic Findings</h4>
-                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.findings}</p>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${c.findings || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Clinical Guidelines</h4>
-                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.guidelines}</p>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.guidelines || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Recommended Treatments</h4>
-                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.treatments}</p>
+                                    <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">${c.treatments || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>` : ''}
                     </div>`;
                 }).join('')}
+            </div>`;
+        }
+
+        function renderAnatomySection() {
+            const anatomyNodes = [
+                { id: 'esophagus', label: 'Esophagus', area: 'Upper GI', search: 'EGD', color: 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 border-indigo-200 dark:border-indigo-800' },
+                { id: 'stomach', label: 'Stomach', area: 'Upper GI', search: 'EGD', color: 'bg-sky-50 dark:bg-sky-900/20 text-sky-600 border-sky-200 dark:border-sky-800' },
+                { id: 'duodenum', label: 'Duodenum', area: 'Upper GI', search: 'EGD', color: 'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 border-cyan-200 dark:border-cyan-800' },
+                { id: 'biliary', label: 'Biliary Tree & Pancreas', area: 'Advanced', search: 'ERCP', color: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 border-amber-200 dark:border-amber-800' },
+                { id: 'small_bowel', label: 'Small Bowel', area: 'Other', search: 'Capsule', color: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 border-emerald-200 dark:border-emerald-800' },
+                { id: 'colon', label: 'Colon (Large Intestine)', area: 'Lower GI', search: 'Colonoscopy', color: 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 border-rose-200 dark:border-rose-800' },
+                { id: 'rectum', label: 'Rectum & Anus', area: 'Lower GI', search: 'Anorectal', color: 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 border-pink-200 dark:border-pink-800' },
+            ];
+
+            return `
+            <div class="p-6 md:p-10 animate-fade-in min-h-[75vh]">
+                <div class="max-w-xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white">Visual Anatomy Map</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Click an anatomical region to filter relevant scopes & procedures.</p>
+                    </div>
+                    
+                    <div class="relative py-4 flex flex-col items-center">
+                        <!-- Connecting Line -->
+                        <div class="absolute top-10 bottom-10 w-1 bg-slate-200 dark:bg-slate-800 rounded-full left-1/2 -translate-x-1/2 z-0"></div>
+                        
+                        <div class="space-y-6 w-full relative z-10">
+                            ${anatomyNodes.map((node, index) => `
+                                <div class="flex flex-col items-center group relative">
+                                    <button onclick="window.navigateFromAnatomy('${node.area}', '${node.search}')" 
+                                        class="w-64 p-4 rounded-2xl border-2 ${node.color} shadow-sm transition-all transform hover:scale-105 hover:shadow-lg active:scale-95 bg-white dark:bg-slate-900 text-center relative z-10 overflow-hidden">
+                                        <div class="absolute inset-0 bg-current opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                                        <h3 class="font-bold text-lg mb-1">${node.label}</h3>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest opacity-80 px-2 py-0.5 rounded-md bg-white/50 dark:bg-black/20">${node.area}</span>
+                                    </button>
+                                    ${index < anatomyNodes.length - 1 ? `
+                                        <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 my-1 group-hover:bg-primary-400 transition-colors"></div>
+                                        <div class="w-3 h-3 rotate-45 border-b-2 border-r-2 border-slate-300 dark:border-slate-700 mb-1 group-hover:border-primary-400 transition-colors"></div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
             </div>`;
         }
 
@@ -1143,7 +1205,11 @@
                 { id: 'bbps', label: 'Bowel Prep (BBPS)' },
                 { id: 'prep', label: 'Prep & Fasting' },
                 { id: 'bsg', label: 'Polyp Surveillance' },
-                { id: 'anticoag', label: 'Anticoagulants' }
+                { id: 'paris', label: 'Paris Classification' },
+                { id: 'biopsy', label: 'Biopsy Protocols' },
+                { id: 'anticoag', label: 'Anticoagulants' },
+                { id: 'emergencies', label: 'Emergencies' },
+                { id: 'pharma', label: 'Sedation & Pharma' }
             ];
 
             const renderTabBar = () => `
@@ -1474,6 +1540,144 @@
                         </div>
                     </div>
                 `;
+            } else if (activeTool === 'paris') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in">
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Paris Classification</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Morphological classification of superficial neoplastic lesions in the GI tract.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <!-- 0-Ip -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-Ip</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Pedunculated</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-3 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative"></div>
+                                    <div class="absolute bottom-3 flex flex-col items-center">
+                                        <div class="w-8 h-8 bg-rose-400 dark:bg-rose-500 rounded-full border border-rose-500 dark:border-rose-600 shadow-sm z-10 relative top-1"></div>
+                                        <div class="w-3 h-5 bg-pink-200 dark:bg-pink-800 border-x border-pink-300 dark:border-pink-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 0-Is -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-Is</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Sessile</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-3 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative"></div>
+                                    <div class="absolute bottom-3 w-12 h-6 bg-rose-400 dark:bg-rose-500 rounded-t-full border-t border-x border-rose-500 dark:border-rose-600 shadow-sm z-10"></div>
+                                </div>
+                            </div>
+
+                            <!-- 0-IIa -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-IIa</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Flat Elevated</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-3 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative"></div>
+                                    <div class="absolute bottom-3 w-14 h-2.5 bg-rose-400 dark:bg-rose-500 rounded-t border-t border-x border-rose-500 dark:border-rose-600 z-10"></div>
+                                </div>
+                            </div>
+
+                            <!-- 0-IIb -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-IIb</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Flat</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-3 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative flex justify-center">
+                                        <div class="w-14 h-full bg-rose-400/50 dark:bg-rose-500/50 border-t-2 border-rose-500 dark:border-rose-600 relative -top-[1px]"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 0-IIc -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-IIc</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Flat Depressed</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-3 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative flex justify-center">
+                                        <div class="w-12 h-2 absolute top-0 bg-white dark:bg-slate-800/50 border-b border-x border-rose-500 dark:border-rose-600 rounded-b-sm">
+                                            <div class="w-full h-full bg-rose-400/30"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 0-III -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 relative overflow-hidden h-40 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-slate-800 dark:text-white">0-III</h4><span class="text-[10px] uppercase text-slate-500 font-bold">Excavated (Ulcer)</span></div>
+                                <div class="absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center">
+                                    <div class="w-full h-4 bg-pink-100 dark:bg-pink-900/40 border-t border-pink-200 dark:border-pink-800 relative flex justify-center">
+                                        <div class="w-10 h-3 absolute top-0 bg-white dark:bg-slate-800/50 border-b-2 border-x-2 border-rose-600 dark:border-rose-500 rounded-b-full shadow-inner">
+                                             <div class="w-full h-full bg-rose-400/20 rounded-b-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'biopsy') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in space-y-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Biopsy Protocols</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Standardized mapping for specific gastric and esophageal conditions.</p>
+                        </div>
+                        
+                        <!-- Sydney Protocol -->
+                        <div class="border border-sky-200 dark:border-sky-800/50 rounded-2xl overflow-hidden">
+                            <div class="bg-sky-50 dark:bg-sky-900/20 p-4 border-b border-sky-200 dark:border-sky-800/50 flex items-center gap-3">
+                                <div class="p-2 bg-sky-100 dark:bg-sky-800 text-sky-600 dark:text-sky-300 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sky-800 dark:text-sky-300">Sydney Protocol</h4>
+                                    <span class="text-[10px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-wider">Gastritis / H. Pylori Mapping</span>
+                                </div>
+                            </div>
+                            <div class="p-5 bg-white dark:bg-slate-900">
+                                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Requires 5 biopsies placed into 2 or 3 separate jars (depending on lab preference) to detect atrophy, metaplasia, and H. pylori.</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-3">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">1</span>
+                                        <div><strong class="text-sm text-slate-800 dark:text-slate-200">Antrum (2 biopsies):</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Greater curvature and lesser curve (2-3 cm from pylorus).</span></div>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">2</span>
+                                        <div><strong class="text-sm text-slate-800 dark:text-slate-200">Corpus (2 biopsies):</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Greater curvature (~8 cm from cardia) and lesser curve (~4 cm proximal to incisura).</span></div>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">3</span>
+                                        <div><strong class="text-sm text-slate-800 dark:text-slate-200">Incisura Angularis (1 biopsy):</strong> <span class="text-sm text-slate-600 dark:text-slate-400">Crucial for detecting early intestinal metaplasia.</span></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Seattle Protocol -->
+                        <div class="border border-rose-200 dark:border-rose-800/50 rounded-2xl overflow-hidden">
+                            <div class="bg-rose-50 dark:bg-rose-900/20 p-4 border-b border-rose-200 dark:border-rose-800/50 flex items-center gap-3">
+                                <div class="p-2 bg-rose-100 dark:bg-rose-800 text-rose-600 dark:text-rose-300 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-rose-800 dark:text-rose-300">Seattle Protocol</h4>
+                                    <span class="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 tracking-wider">Barrett's Esophagus Surveillance</span>
+                                </div>
+                            </div>
+                            <div class="p-5 bg-white dark:bg-slate-900">
+                                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Meticulous mapping required to maximize the detection rate of dysplasia in Barrett's segments.</p>
+                                <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl space-y-2">
+                                    <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-rose-500 rounded-full"></div><strong class="text-sm text-slate-800 dark:text-white">Step 1: Targeted Biopsies</strong></div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 pl-4 mb-4">First, biopsy any visible lesions, nodules, or mucosal irregularities and place them in specifically labeled, separate jars.</p>
+                                    
+                                    <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 bg-slate-500 rounded-full"></div><strong class="text-sm text-slate-800 dark:text-white">Step 2: 4-Quadrant Biopsies</strong></div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 pl-4">Starting from the proximal margin of the gastric folds (GEJ), take 4 quadrant biopsies (12, 3, 6, and 9 o'clock). Repeat this every <strong>2 cm</strong> (or every <strong>1 cm</strong> if known prior dysplasia) moving proximally until you reach the squamocolumnar junction (Z-line).</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 pl-4 mt-2 italic">*Each level (e.g., 38cm, 36cm, 34cm) should be placed in its own designated jar.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else if (activeTool === 'anticoag') {
                 const rec = getAnticoagRecommendation();
                 toolContent = `
@@ -1511,6 +1715,166 @@
                         <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-xs text-slate-500 dark:text-slate-400">
                             <strong>Reference:</strong> BSG/ESGE Guidelines on anticoagulant and antiplatelet drugs in endoscopy (2021). Always consult specific patient history (e.g. Mechanical Valve, Recent Stent).
                         </div>
+                    </div>
+                `;
+            } else if (activeTool === 'emergencies') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in space-y-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Emergency Pathways
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Quick-action algorithms for endoscopic emergencies.</p>
+                        </div>
+                        
+                        <!-- Variceal Bleed -->
+                        <div class="border-l-4 border-rose-500 bg-rose-50 dark:bg-rose-900/10 p-5 rounded-r-2xl shadow-sm">
+                            <h4 class="font-bold text-rose-800 dark:text-rose-300 text-base mb-3">Variceal Hemorrhage</h4>
+                            <ul class="text-sm text-slate-700 dark:text-slate-300 space-y-3 list-none font-medium">
+                                <li class="flex items-start gap-2"><strong class="text-rose-600 dark:text-rose-400 min-w-[100px]">1. Resuscitate:</strong> <span>Airway protection, 2x large bore IVs, target Hb 70-80 g/L (do not over-transfuse).</span></li>
+                                <li class="flex items-start gap-2"><strong class="text-rose-600 dark:text-rose-400 min-w-[100px]">2. Medicate:</strong> <span>Terlipressin (2mg IV stat) + Prophylactic Antibiotics (e.g., Ceftriaxone 1g IV).</span></li>
+                                <li class="flex items-start gap-2"><strong class="text-rose-600 dark:text-rose-400 min-w-[100px]">3. Endoscopy:</strong> <span>Urgent EGD within 12 hours for band ligation.</span></li>
+                                <li class="flex items-start gap-2"><strong class="text-rose-600 dark:text-rose-400 min-w-[100px]">4. Rescue:</strong> <span>Sengstaken-Blakemore tube or Danis stent for uncontrollable bleeding. Early TIPS consideration.</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Foreign Body -->
+                        <div class="border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/10 p-5 rounded-r-2xl shadow-sm">
+                            <h4 class="font-bold text-amber-800 dark:text-amber-300 text-base mb-3">Foreign Body Ingestion</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+                                        <span class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Emergent (&lt; 2 hours)</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">Button batteries in esophagus, sharp objects in esophagus, complete obstruction (patient cannot swallow saliva).</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Urgent (&lt; 24 hours)</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300">Blunt objects in esophagus, magnets, sharp objects in stomach/duodenum, food bolus (if handling saliva).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Suspected Perforation -->
+                        <div class="border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/10 p-5 rounded-r-2xl shadow-sm">
+                            <h4 class="font-bold text-orange-800 dark:text-orange-300 text-base mb-3">Suspected Perforation</h4>
+                            <ul class="text-sm text-slate-700 dark:text-slate-300 space-y-2 list-disc ml-5 font-medium marker:text-orange-400">
+                                <li>Strict NPO (Nil per os) immediately.</li>
+                                <li>IV fluid resuscitation & Broad-spectrum IV antibiotics (e.g., Tazocin).</li>
+                                <li>Urgent Surgical / Surgical Gastro consult.</li>
+                                <li>Imaging: CT chest/abdo/pelvis with water-soluble oral contrast (e.g., Gastrografin). <strong class="text-orange-600 dark:text-orange-400">NO Barium.</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (activeTool === 'pharma') {
+                toolContent = `
+                    <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 animate-fade-in space-y-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">Sedation & Pharmacology</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Standard adult dosing guidelines for conscious sedation and antispasmodics.</p>
+                        </div>
+
+                        <!-- Sedatives -->
+                        <div>
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">Primary Sedatives / Analgesics</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h5 class="font-bold text-slate-800 dark:text-slate-200 text-base">Midazolam</h5>
+                                        <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded font-bold uppercase">Benzodiazepine</span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-3">Anxiolytic & amnesic. Slow onset (2-3 mins).</p>
+                                    <div class="text-sm font-medium text-slate-700 dark:text-slate-300 space-y-1">
+                                        <div><span class="text-slate-500 w-20 inline-block">Initial:</span> 1 - 2 mg IV</div>
+                                        <div><span class="text-slate-500 w-20 inline-block">Titration:</span> 0.5 - 1 mg increments</div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                        <span class="text-[11px] text-slate-500 italic">*Reduce dose in elderly (&gt;70y) or frail patients.</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h5 class="font-bold text-slate-800 dark:text-slate-200 text-base">Fentanyl</h5>
+                                        <span class="text-[10px] bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 px-2 py-1 rounded font-bold uppercase">Opioid</span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-3">Potent analgesic. Fast onset (1-2 mins).</p>
+                                    <div class="text-sm font-medium text-slate-700 dark:text-slate-300 space-y-1">
+                                        <div><span class="text-slate-500 w-20 inline-block">Initial:</span> 25 - 50 mcg IV</div>
+                                        <div><span class="text-slate-500 w-20 inline-block">Titration:</span> 25 mcg increments</div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                        <span class="text-[11px] text-slate-500 italic">*Synergistic respiratory depression when combined with Midazolam.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reversals -->
+                        <div>
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">Reversal Agents (Resuscitation)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-emerald-50 dark:bg-emerald-900/10 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-800/50">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <h5 class="font-bold text-emerald-800 dark:text-emerald-300 text-base">Flumazenil <span class="text-xs font-normal opacity-70">(Romazicon)</span></h5>
+                                        <span class="text-[10px] bg-emerald-200 dark:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200 px-2 py-1 rounded font-bold uppercase">Reverses Midazolam</span>
+                                    </div>
+                                    <div class="text-sm font-medium text-emerald-900 dark:text-emerald-200 space-y-1">
+                                        <div><span class="opacity-70 w-16 inline-block">Dose:</span> 0.2 mg IV over 15 sec.</div>
+                                        <div><span class="opacity-70 w-16 inline-block">Repeat:</span> 0.1 mg every 1 min (Max 1 mg).</div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-emerald-200/50 dark:border-emerald-800/50">
+                                        <span class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">*Caution: Risk of seizures in chronic benzo users.</span>
+                                    </div>
+                                </div>
+                                <div class="bg-emerald-50 dark:bg-emerald-900/10 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-800/50">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <h5 class="font-bold text-emerald-800 dark:text-emerald-300 text-base">Naloxone <span class="text-xs font-normal opacity-70">(Narcan)</span></h5>
+                                        <span class="text-[10px] bg-emerald-200 dark:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200 px-2 py-1 rounded font-bold uppercase">Reverses Fentanyl</span>
+                                    </div>
+                                    <div class="text-sm font-medium text-emerald-900 dark:text-emerald-200 space-y-1">
+                                        <div><span class="opacity-70 w-16 inline-block">Dose:</span> 0.1 - 0.2 mg IV.</div>
+                                        <div><span class="opacity-70 w-16 inline-block">Repeat:</span> Every 2-3 mins as needed.</div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-emerald-200/50 dark:border-emerald-800/50">
+                                        <span class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">*Half-life is shorter than opioids; monitor closely for re-sedation.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Antispasmodics -->
+                        <div>
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-pink-600 dark:text-pink-400 mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">Antispasmodics</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                    <h5 class="font-bold text-slate-800 dark:text-slate-200 text-base mb-1">Hyoscine Butylbromide <span class="text-sm font-normal opacity-70">(Buscopan)</span></h5>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-3">Reduces bowel motility. Onset 1-2 mins.</p>
+                                    <div class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        <span class="text-slate-500 w-16 inline-block">Dose:</span> 20 mg IV.
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                        <span class="text-[11px] text-slate-500 italic">*Contraindicated in tachycardia, untreated angle-closure glaucoma, myasthenia gravis.</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                    <h5 class="font-bold text-slate-800 dark:text-slate-200 text-base mb-1">Glucagon</h5>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-3">Alternative antispasmodic (esp. for upper GI/ERCP).</p>
+                                    <div class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        <span class="text-slate-500 w-16 inline-block">Dose:</span> 0.25 - 1 mg IV.
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                        <span class="text-[11px] text-slate-500 italic">*Can cause delayed nausea/vomiting. Safer alternative for cardiac patients (unlike Buscopan).</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 `;
             }
@@ -1558,9 +1922,9 @@
             let content = '';
             if (isLoading) content = `<div class="py-32 flex flex-col items-center justify-center space-y-5 animate-fade-in"><div class="w-14 h-14 rounded-full border-4 border-slate-100 dark:border-slate-800 border-t-primary-500 animate-spin"></div><p class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest animate-pulse-subtle">Loading Directory...</p></div>`;
             else if (currentView === 'directory') content = renderDirectorySection();
+            else if (currentView === 'anatomy') content = renderAnatomySection();
             else if (currentView === 'conditions') content = renderConditionsSection();
             else if (currentView === 'calculators') content = renderCalculatorsSection();
-            else content = `<div class="p-12 text-center text-slate-400 font-medium animate-fade-in">Guidelines View (Coming Soon)</div>`;
 
             const navBtn = (view, label, icon) => 
                 `<button onclick="window.setView('${view}')" class="relative flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${currentView === view ? 'bg-white dark:bg-slate-700 text-primary-700 dark:text-primary-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200'}">
@@ -1568,8 +1932,8 @@
                 </button>`;
 
             app.innerHTML = `
-                <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-30 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex items-center gap-4 mb-4 md:mb-0 self-start md:self-auto w-full md:w-auto justify-between md:justify-start">
+                <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-30 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row justify-between items-center">
+                    <div class="flex items-center gap-4 mb-4 lg:mb-0 self-start lg:self-auto w-full lg:w-auto justify-between lg:justify-start">
                          <div class="flex items-center gap-4">
                              <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -1580,20 +1944,21 @@
                              </div>
                          </div>
                          
-                         <div class="md:hidden flex items-center gap-2">
+                         <div class="lg:hidden flex items-center gap-2">
                             <button onclick="window.toggleDarkMode()" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                                 ${isDarkMode ? SunIcon : MoonIcon}
                             </button>
                          </div>
                     </div>
                     
-                    <div class="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm self-stretch md:self-auto justify-center">
+                    <div class="flex flex-wrap items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm self-stretch md:self-auto justify-center">
                         ${navBtn('directory', 'Procedures', null)}
+                        ${navBtn('anatomy', 'Anatomy', AnatomyIcon)}
                         ${navBtn('conditions', 'Conditions', BookIcon)}
                         ${navBtn('calculators', 'Tools', CalculatorIcon)}
                     </div>
 
-                    <div class="hidden md:flex items-center space-x-3">
+                    <div class="hidden lg:flex items-center space-x-3">
                         ${isOwner ? `<span class="px-3 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-[10px] font-bold rounded-lg border border-primary-100 dark:border-primary-800/50 animate-fade-in uppercase tracking-wider">Admin</span>` : ''}
                         
                         <button onclick="window.toggleDarkMode()" class="p-2.5 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition hover:text-slate-800 dark:hover:text-white">
@@ -1614,20 +1979,15 @@
         async function init() {
             window.renderApp = renderApp;
             try {
-                let firebaseConfig;
-                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                    firebaseConfig = JSON.parse(__firebase_config);
-                } else {
-                    firebaseConfig = {
-                        apiKey: "AIza" + "SyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0", 
-                        authDomain: "gi-endo-directory.firebaseapp.com",
-                        projectId: "gi-endo-directory",
-                        storageBucket: "gi-endo-directory.firebasestorage.app",
-                        messagingSenderId: "1041835888935",
-                        appId: "1:1041835888935:web:1782834489611665cf9902",
-                        measurementId: "G-69TRT9Z7KC"
-                    };
-                }
+                const firebaseConfig = {
+                    apiKey: "AIza" + "SyDG2u8y0wwUGALePG02f-1IIq4SE9QTFY0", 
+                    authDomain: "gi-endo-directory.firebaseapp.com",
+                    projectId: "gi-endo-directory",
+                    storageBucket: "gi-endo-directory.firebasestorage.app",
+                    messagingSenderId: "1041835888935",
+                    appId: "1:1041835888935:web:1782834489611665cf9902",
+                    measurementId: "G-69TRT9Z7KC"
+                };
 
                 if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("PASTE_YOUR_")) {
                     console.warn("Firebase credentials missing.");
@@ -1641,11 +2001,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
                 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) { 
