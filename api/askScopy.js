@@ -15,10 +15,17 @@ export default async function handler(req) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    // Using Flash-8B: The fastest model for large context
+    
+    // Check if Vercel is failing to inject the environment variable
+    if (!apiKey) {
+        return new Response(
+            JSON.stringify({ reply: "Diagnostic Error: Vercel cannot find the GEMINI_API_KEY environment variable." }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`;
 
-    // Direct REST API call (Bypasses the buggy SDK on Vercel Edge)
     const googleResponse = await fetch(url, {
       method: 'POST',
       headers: {
@@ -29,22 +36,34 @@ export default async function handler(req) {
           parts: [{ text: systemPrompt }]
         },
         contents: [
-          { parts: [{ text: text }] }
+          { role: "user", parts: [{ text: text }] } // Explicitly define the role
         ],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: 250 // Force the AI to be concise and finish generating quickly
+          maxOutputTokens: 250 
         }
       })
     });
 
+    // If Google rejects the request, send the EXACT error to the chat UI
     if (!googleResponse.ok) {
       const errorText = await googleResponse.text();
-      console.error("Google API Error:", errorText);
-      throw new Error("Google API returned a non-200 status");
+      return new Response(
+        JSON.stringify({ reply: `Google API Rejected Request (${googleResponse.status}): ${errorText.substring(0, 300)}` }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await googleResponse.json();
+    
+    // Check if Google's safety filters blocked the response
+    if (!data.candidates || data.candidates.length === 0) {
+        return new Response(
+            JSON.stringify({ reply: "Diagnostic Error: Google returned an empty response. It may have triggered a safety filter." }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
+
     const aiText = data.candidates[0].content.parts[0].text;
 
     return new Response(JSON.stringify({ reply: aiText }), {
@@ -53,9 +72,9 @@ export default async function handler(req) {
     });
 
   } catch (error) {
-    console.error("Direct Fetch Error:", error);
+    // If the code crashes entirely, send the stack trace
     return new Response(
-      JSON.stringify({ reply: "My connection to the server was interrupted! Let's try that again." }),
+      JSON.stringify({ reply: `Code Crash: ${error.message}` }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
