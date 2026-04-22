@@ -1,61 +1,61 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// 1. Force Vercel to use the Edge network (bypasses 10s timeout)
 export const config = {
-  runtime: 'edge',
+  runtime: 'edge', // Keep the Edge network for speed
 };
 
 export default async function handler(req) {
-  // 2. Edge functions only allow POST requests for payloads
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
 
   try {
-    // 3. Extract the payload using Web API methods
     const { text, systemPrompt } = await req.json();
 
     if (!text) {
-      return new Response(JSON.stringify({ error: 'Missing prompt text' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Missing prompt text' }), { status: 400 });
     }
 
-    // 4. Initialize Gemini (Ensure your Vercel Environment Variables contain GEMINI_API_KEY)
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash', // Using flash for maximum speed
-      systemInstruction: systemPrompt,
+    const apiKey = process.env.GEMINI_API_KEY;
+    // Using Flash-8B: The fastest model for large context
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`;
+
+    // Direct REST API call (Bypasses the buggy SDK on Vercel Edge)
+    const googleResponse = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        contents: [
+          { parts: [{ text: text }] }
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 250 // Force the AI to be concise and finish generating quickly
+        }
+      })
     });
 
-    // 5. Fetch the response
-    const result = await model.generateContent(text);
-    const response = await result.response;
-    const aiText = response.text();
+    if (!googleResponse.ok) {
+      const errorText = await googleResponse.text();
+      console.error("Google API Error:", errorText);
+      throw new Error("Google API returned a non-200 status");
+    }
 
-    // 6. Return standard Web Response
+    const data = await googleResponse.json();
+    const aiText = data.candidates[0].content.parts[0].text;
+
     return new Response(JSON.stringify({ reply: aiText }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error("Scopy Edge Error:", error);
-
-    // 7. Handle Google API timeouts or specific errors gracefully
-    if (error.message && error.message.includes('fetch')) {
-      return new Response(
-        JSON.stringify({ reply: "I'm thinking a bit too hard! My connection timed out. Could you try asking that in a slightly shorter way?" }),
-        { status: 504, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
+    console.error("Direct Fetch Error:", error);
     return new Response(
-      JSON.stringify({ reply: `Backend Error: ${error.message}` }),
+      JSON.stringify({ reply: "My connection to the server was interrupted! Let's try that again." }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
