@@ -538,31 +538,27 @@
             const loading = document.getElementById('chat-loading');
             loading.classList.remove('hidden');
 
-            const currentData = JSON.stringify(proceduresData.map(p => ({
-                Procedure: p.name,
-                Category: p.area,
-                Accessories_Available: p.accessories.map(a => `${a.name} (${a.type}): ${a.use}`)
-            })));
+           // Compress Knowledge Base context to plain text instead of heavy JSON
+            const procContext = proceduresData.map(p => 
+                `Procedure: ${p.name}. Accessories: ${p.accessories.map(a => a.name).join(', ')}`
+            ).join('\n');
 
-            const currentCondData = JSON.stringify(conditionsData.map(c => ({
-                Condition: c.name,
-                Category: c.area,
-                Details: c.description,
-                Findings: c.findings,
-                Guidelines: c.guidelines,
-                Treatments: c.treatments
-            })));
+            const condContext = conditionsData.map(c => 
+                `Condition: ${c.name}. Findings: ${c.findings} Treatments: ${c.treatments}`
+            ).join('\n');
 
-            const systemPrompt = `You are Scopy. You are integrated directly into the Endoscopy Directory app.
-            Your Knowledge Base (Real-time Directory Data):
-            Procedures: ${currentData}
-            Conditions: ${currentCondData}
-
+            const systemPrompt = `You are Scopy. You are integrated into the Endoscopy Directory app.
+            Knowledge Base:
+            ---
+            ${procContext}
+            ---
+            ${condContext}
+            ---
             Instructions:
-            1. Answer strictly based on the provided Knowledge Base. Do not invent accessories, conditions, or treatments.
-            2. When asked about conditions, you can provide their descriptions, findings, clinical guidelines, and recommended treatments.
-            3. If asked about clinical scores, classifications, prep, or emergencies (GBS, Rockall, Forrest, Prague, BBPS, BSG, Paris Classification, Biopsy Protocols, Anticoagulants, Fasting, Prep, Variceal Bleeds, Foreign Bodies, Perforations, Sedation, Midazolam, Fentanyl, Reversals, Antispasmodics), briefly explain them and tell the user they can view detailed guides and calculators in the "Tools" tab of this app.
-            4. Keep responses concise, professional, and friendly. Use short paragraphs. You may use **bold** text for emphasis.`;
+            1. Answer strictly based on the Knowledge Base. Do not invent info.
+            2. When asked about conditions, provide findings, guidelines, and treatments.
+            3. For clinical scores/guides (GBS, Rockall, Forrest, Prague, BBPS, BSG, Paris, Biopsies, Anticoagulants, Prep, Emergencies, Sedation), briefly explain and tell the user to check the "Tools" tab.
+            4. Keep responses concise and friendly. Use **bold** for emphasis.`;
             
             try {
                 const response = await fetch('/api/askScopy', {
