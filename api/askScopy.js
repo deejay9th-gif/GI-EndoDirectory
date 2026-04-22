@@ -1,3 +1,6 @@
+export const config = {
+  runtime: 'edge',
+};
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 module.exports = async function handler(req, res) {
