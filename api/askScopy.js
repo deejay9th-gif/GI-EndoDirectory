@@ -21,8 +21,11 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // FIX 1 & 2: Upgraded to 'v1' stable endpoint and explicitly asking for 'flash-latest'
-    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
+    // THE UNBREAKABLE FIX: We glue the system instructions and the user text together.
+    // This completely bypasses Google's strict JSON schema validation.
+    const combinedPrompt = systemPrompt + "\n\nUser Question: " + text;
+
+    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
       method: 'POST',
@@ -30,11 +33,9 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
+        // Notice: "systemInstruction" has been completely deleted!
         contents: [
-          { role: "user", parts: [{ text: text }] }
+          { role: "user", parts: [{ text: combinedPrompt }] }
         ],
         generationConfig: {
           temperature: 0.2,
