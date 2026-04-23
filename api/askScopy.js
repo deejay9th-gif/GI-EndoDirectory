@@ -19,12 +19,12 @@ export default async function handler(req, res) {
       return res.status(500).json({ reply: 'Error: GEMINI_API_KEY is missing in Vercel.' });
     }
 
-    // THE MAGIC FIX: .trim() strips away any accidental invisible spaces or newlines
+    // Clean the key
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // Explicitly calling the standard flash model
-    const model = 'gemini-1.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    // OLD-SCHOOL URL CONSTRUCTION: No ${} variables that can get accidentally erased!
+    // Using the official "v1" stable endpoint
+    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
       method: 'POST',
@@ -46,10 +46,10 @@ export default async function handler(req, res) {
     });
 
     if (!googleResponse.ok) {
+      // I removed the substring limit so we can see the full, exact error from Google
       const errorText = await googleResponse.text();
-      console.error("Google API Error:", errorText);
       return res.status(500).json({ 
-        reply: `Google API Error (${googleResponse.status}): ${errorText.substring(0, 150)}` 
+        reply: "Google API Error (" + googleResponse.status + "): " + errorText 
       });
     }
 
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error("Server Crash:", error);
     return res.status(500).json({ 
-      reply: `Server Crash: ${error.message}` 
+      reply: "Server Crash: " + error.message
     });
   }
 }
