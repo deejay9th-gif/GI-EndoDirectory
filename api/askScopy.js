@@ -21,7 +21,6 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // Upgrading to the active 2.5 Flash model!
     const combinedPrompt = systemPrompt + "\n\nUser Question: " + text;
     
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
@@ -44,6 +43,15 @@ export default async function handler(req, res) {
 
     if (!googleResponse.ok) {
       const errorText = await googleResponse.text();
+      
+      // THE FIX: Catch the 503 Traffic Spike and make it friendly!
+      if (googleResponse.status === 503) {
+         return res.status(200).json({ 
+            reply: "Whoa, a lot of people are asking me questions right now and my brain is a little overloaded! 🧠 Give me just a few seconds and try asking that again." 
+         });
+      }
+
+      // If it's a different error, we still want to see it for debugging
       return res.status(200).json({ 
         reply: "🚨 GOOGLE ERROR: " + errorText 
       });
