@@ -1,81 +1,47 @@
-export const config = {
-  runtime: 'edge', // Keep the Edge network for speed
-};
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-export default async function handler(req) {
+// Notice: We completely removed the `runtime: 'edge'` configuration.
+// We are back on Vercel's incredibly stable standard Node.js network.
+
+export default async function handler(req, res) {
+  // 1. Only allow POST requests
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { text, systemPrompt } = await req.json();
+    // 2. Extract the compressed text payload we set up in index.html
+    const { text, systemPrompt } = req.body;
 
     if (!text) {
-      return new Response(JSON.stringify({ error: 'Missing prompt text' }), { status: 400 });
+      return res.status(400).json({ error: 'Missing prompt text' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    // Check if Vercel is failing to inject the environment variable
-    if (!apiKey) {
-        return new Response(
-            JSON.stringify({ reply: "Diagnostic Error: Vercel cannot find the GEMINI_API_KEY environment variable." }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ reply: 'Server Configuration Error: API key is missing.' });
     }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const googleResponse = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        contents: [
-          { role: "user", parts: [{ text: text }] } // Explicitly define the role
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 250 
-        }
-      })
+    // 3. Initialize the official Google SDK
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash', // The SDK will automatically handle regional routing for this model
+      systemInstruction: systemPrompt,
     });
 
-    // If Google rejects the request, send the EXACT error to the chat UI
-    if (!googleResponse.ok) {
-      const errorText = await googleResponse.text();
-      return new Response(
-        JSON.stringify({ reply: `Google API Rejected Request (${googleResponse.status}): ${errorText.substring(0, 300)}` }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    // 4. Fetch the response from Gemini
+    const result = await model.generateContent(text);
+    const response = await result.response;
+    const aiText = response.text();
 
-    const data = await googleResponse.json();
-    
-    // Check if Google's safety filters blocked the response
-    if (!data.candidates || data.candidates.length === 0) {
-        return new Response(
-            JSON.stringify({ reply: "Diagnostic Error: Google returned an empty response. It may have triggered a safety filter." }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
-    }
-
-    const aiText = data.candidates[0].content.parts[0].text;
-
-    return new Response(JSON.stringify({ reply: aiText }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    // 5. Send the successful reply back to the frontend
+    return res.status(200).json({ reply: aiText });
 
   } catch (error) {
-    // If the code crashes entirely, send the stack trace
-    return new Response(
-      JSON.stringify({ reply: `Code Crash: ${error.message}` }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error("Backend Error:", error);
+    
+    // 6. Graceful error handling
+    return res.status(500).json({ 
+      reply: "My connection wobbled for a second! Let me catch my breath. Could you ask that one more time?" 
+    });
   }
 }
