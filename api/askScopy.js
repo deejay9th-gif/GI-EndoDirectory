@@ -1,12 +1,13 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// Look ma, no imports! We completely removed the buggy @google/generative-ai SDK.
 
 export default async function handler(req, res) {
+  // 1. Ensure POST request
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // 1. Safely parse the body whether Vercel sends it as a string or an object
+    // 2. Parse Body safely
     let body = req.body;
     if (typeof body === 'string') {
       body = JSON.parse(body);
@@ -15,33 +16,61 @@ export default async function handler(req, res) {
     const { text, systemPrompt } = body;
 
     if (!text) {
-      return res.status(400).json({ reply: 'Diagnostic Error: Prompt text is missing from the request.' });
+      return res.status(400).json({ reply: 'Error: Prompt text is missing.' });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ reply: 'Diagnostic Error: GEMINI_API_KEY environment variable is missing.' });
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ reply: 'Error: GEMINI_API_KEY is missing in Vercel.' });
     }
 
-    // 2. Initialize the SDK
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt,
+    // 3. Native Fetch to Google REST API (Bypassing the NPM package entirely)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const googleResponse = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        contents: [
+          { role: "user", parts: [{ text: text }] }
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 400 // Capped to ensure lightning-fast responses
+        }
+      })
     });
 
-    // 3. Call Gemini
-    const result = await model.generateContent(text);
-    const response = await result.response;
-    const aiText = response.text();
+    if (!googleResponse.ok) {
+      const errorText = await googleResponse.text();
+      console.error("Google API Error:", errorText);
+      return res.status(500).json({ 
+        reply: `Google API Error (${googleResponse.status}): ${errorText.substring(0, 150)}` 
+      });
+    }
 
+    const data = await googleResponse.json();
+    
+    // Safety net in case Google sends back an empty response
+    if (!data.candidates || data.candidates.length === 0) {
+        return res.status(500).json({ reply: "Google returned an empty response (possible safety filter trigger)." });
+    }
+
+    // Extract the AI text
+    const aiText = data.candidates[0].content.parts[0].text;
+
+    // 4. Return successful response
     return res.status(200).json({ reply: aiText });
 
   } catch (error) {
-    console.error("Backend Error:", error);
-    
-    // 4. PRINT THE EXACT CRASH MESSAGE TO THE CHAT
+    console.error("Native Fetch Crash:", error);
     return res.status(500).json({ 
-      reply: `Node.js Crash: ${error.message}` 
+      reply: `Server Crash: ${error.message}` 
     });
   }
 }
