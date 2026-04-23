@@ -1,6 +1,5 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    // Sending a 200 status so the frontend doesn't chop the message!
     return res.status(200).json({ reply: 'Method not allowed' });
   }
 
@@ -22,8 +21,8 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // Using v1beta for maximum compatibility
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+    // FIX 1 & 2: Upgraded to 'v1' stable endpoint and explicitly asking for 'flash-latest'
+    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
       method: 'POST',
@@ -46,9 +45,8 @@ export default async function handler(req, res) {
 
     if (!googleResponse.ok) {
       const errorText = await googleResponse.text();
-      // THE TROJAN HORSE: We return a 200 status so your frontend prints the whole thing!
       return res.status(200).json({ 
-        reply: "🚨 FULL GOOGLE ERROR: " + errorText 
+        reply: "🚨 GOOGLE ERROR: " + errorText 
       });
     }
 
