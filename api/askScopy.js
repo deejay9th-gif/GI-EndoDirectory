@@ -21,10 +21,9 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // THE REAL FIX: Upgrading from the retired 1.5 model to the active 2.5 Flash model!
+    // Upgrading to the active 2.5 Flash model!
     const combinedPrompt = systemPrompt + "\n\nUser Question: " + text;
     
-    // Notice the updated URL using gemini-2.5-flash and v1beta
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
@@ -58,7 +57,6 @@ export default async function handler(req, res) {
 
     const aiText = data.candidates[0].content.parts[0].text;
 
-    // A clean, successful 200 OK response!
     return res.status(200).json({ reply: aiText });
 
   } catch (error) {
