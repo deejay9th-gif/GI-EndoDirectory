@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    // Sending a 200 status so the frontend doesn't chop the message!
+    return res.status(200).json({ reply: 'Method not allowed' });
   }
 
   try {
@@ -12,19 +13,17 @@ export default async function handler(req, res) {
     const { text, systemPrompt } = body;
 
     if (!text) {
-      return res.status(400).json({ reply: 'Error: Prompt text is missing.' });
+      return res.status(200).json({ reply: 'Error: Prompt text is missing.' });
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ reply: 'Error: GEMINI_API_KEY is missing in Vercel.' });
+      return res.status(200).json({ reply: 'Error: GEMINI_API_KEY is missing in Vercel.' });
     }
 
-    // Clean the key
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // OLD-SCHOOL URL CONSTRUCTION: No ${} variables that can get accidentally erased!
-    // Using the official "v1" stable endpoint
-    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+    // Using v1beta for maximum compatibility
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
       method: 'POST',
@@ -46,17 +45,17 @@ export default async function handler(req, res) {
     });
 
     if (!googleResponse.ok) {
-      // I removed the substring limit so we can see the full, exact error from Google
       const errorText = await googleResponse.text();
-      return res.status(500).json({ 
-        reply: "Google API Error (" + googleResponse.status + "): " + errorText 
+      // THE TROJAN HORSE: We return a 200 status so your frontend prints the whole thing!
+      return res.status(200).json({ 
+        reply: "🚨 FULL GOOGLE ERROR: " + errorText 
       });
     }
 
     const data = await googleResponse.json();
     
     if (!data.candidates || data.candidates.length === 0) {
-        return res.status(500).json({ reply: "Google returned an empty response." });
+        return res.status(200).json({ reply: "Google returned an empty response." });
     }
 
     const aiText = data.candidates[0].content.parts[0].text;
@@ -65,7 +64,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Server Crash:", error);
-    return res.status(500).json({ 
+    return res.status(200).json({ 
       reply: "Server Crash: " + error.message
     });
   }
