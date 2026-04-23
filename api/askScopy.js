@@ -21,11 +21,11 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.GEMINI_API_KEY.trim(); 
     
-    // THE UNBREAKABLE FIX: We glue the system instructions and the user text together.
-    // This completely bypasses Google's strict JSON schema validation.
+    // THE REAL FIX: Upgrading from the retired 1.5 model to the active 2.5 Flash model!
     const combinedPrompt = systemPrompt + "\n\nUser Question: " + text;
-
-    const url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+    
+    // Notice the updated URL using gemini-2.5-flash and v1beta
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
 
     const googleResponse = await fetch(url, {
       method: 'POST',
@@ -33,7 +33,6 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // Notice: "systemInstruction" has been completely deleted!
         contents: [
           { role: "user", parts: [{ text: combinedPrompt }] }
         ],
@@ -59,6 +58,7 @@ export default async function handler(req, res) {
 
     const aiText = data.candidates[0].content.parts[0].text;
 
+    // A clean, successful 200 OK response!
     return res.status(200).json({ reply: aiText });
 
   } catch (error) {
