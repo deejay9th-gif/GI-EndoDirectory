@@ -521,7 +521,7 @@
             container.innerHTML += `
                 <div class="flex gap-2 w-full ${isUser ? 'justify-end' : ''} animate-slide-up">
                     ${!isUser ? `<div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-600 flex items-center justify-center flex-shrink-0 text-sm shadow-sm ring-1 ring-primary-500/20">🤖</div>` : ''}
-                    <div class="p-3.5 rounded-2xl text-sm shadow-sm ${isUser ? 'bg-primary-600 text-white rounded-br-none max-w-[85%]' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-none max-w-[85%]'} leading-relaxed">
+                    <div class="p-3.5 rounded-2xl text-sm shadow-sm ${isUser ? 'bg-primary-600 text-white rounded-br-none max-w-[85%]' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-none max-w-[85%]'} leading-relaxed whitespace-pre-wrap">
                         ${formattedText}
                     </div>
                 </div>
